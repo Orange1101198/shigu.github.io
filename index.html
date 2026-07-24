@@ -1,0 +1,3361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>📚 全能备忘录</title>
+    <style>
+        /* ===== 白色背景 + 蓝色马卡龙UI ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang SC', Roboto, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 1.5rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+        .app {
+            width: 100%;
+            max-width: 1400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 2.8rem;
+            padding: 1.8rem 2rem 1.5rem;
+            box-shadow: 0 20px 60px rgba(100, 150, 200, 0.08);
+            border: 1px solid rgba(200, 225, 240, 0.4);
+            min-height: 95vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2a5a7a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.3rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(180, 210, 230, 0.3);
+            letter-spacing: -0.5px;
+        }
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.2rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(180, 210, 230, 0.3);
+            padding-bottom: 0.3rem;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.5rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #5a7a8a;
+            border-radius: 12px 12px 0 0;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn:hover {
+            background: rgba(180, 210, 230, 0.15);
+        }
+        .tab-btn.active {
+            color: #3a7a9a;
+            border-bottom-color: #7ab8d4;
+            background: rgba(180, 210, 230, 0.1);
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 0.5rem;
+        }
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+        .tab-pane.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0.4;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== 蓝色马卡龙卡片 ===== */
+        .card {
+            background: rgba(240, 248, 255, 0.7);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(200, 225, 240, 0.6);
+            box-shadow: 0 4px 16px rgba(150, 190, 210, 0.06);
+            transition: box-shadow 0.2s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 28px rgba(150, 190, 210, 0.1);
+        }
+        .card h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2a5a7a;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* ===== 蓝色马卡龙输入框 ===== */
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1rem;
+            margin-bottom: 0.8rem;
+            align-items: center;
+        }
+        .row label {
+            font-weight: 600;
+            color: #4a6a7a;
+            font-size: 0.85rem;
+            min-width: 60px;
+        }
+        .row input,
+        .row select,
+        .row textarea {
+            flex: 1;
+            min-width: 120px;
+            padding: 0.6rem 1rem;
+            border-radius: 24px;
+            border: 1px solid rgba(180, 210, 230, 0.5);
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            outline: none;
+            transition: 0.25s;
+            color: #2a4a5a;
+            box-shadow: 0 2px 6px rgba(150, 190, 210, 0.04);
+        }
+        .row input:focus,
+        .row select:focus,
+        .row textarea:focus {
+            border-color: #7ab8d4;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(130, 190, 220, 0.15);
+        }
+        .row input::placeholder,
+        .row textarea::placeholder {
+            color: #a0b8c8;
+            font-weight: 300;
+        }
+        .row input[type="color"] {
+            flex: 0 0 auto;
+            width: 50px;
+            padding: 0.2rem;
+            min-width: unset;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* ===== 蓝色马卡龙按钮 ===== */
+        .btn {
+            background: #7ab8d4;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 2px 12px rgba(100, 170, 200, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+        }
+        .btn:hover {
+            background: #6aa8c4;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(100, 170, 200, 0.25);
+        }
+        .btn-sm {
+            padding: 0.3rem 1.2rem;
+            font-size: 0.78rem;
+            border-radius: 100px;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #4a7a8a;
+            border: 1px solid rgba(180, 210, 230, 0.4);
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: rgba(180, 210, 230, 0.1);
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background: #d09a9a;
+        }
+        .btn-danger:hover {
+            background: #b08080;
+        }
+        .btn-success {
+            background: #90c0a0;
+        }
+        .btn-success:hover {
+            background: #70a080;
+        }
+
+        /* ===== 卡片网格（紧凑） ===== */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        .entry-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 1.6rem;
+            padding: 0.7rem 0.9rem 0.9rem;
+            border: 1px solid rgba(200, 225, 240, 0.5);
+            box-shadow: 0 2px 12px rgba(150, 190, 210, 0.04);
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+            font-size: 0.85rem;
+        }
+        .entry-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(150, 190, 210, 0.08);
+            border-color: rgba(180, 210, 230, 0.4);
+            background: rgba(255, 255, 255, 0.95);
+        }
+        .entry-card .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.4rem;
+            margin-bottom: 0.2rem;
+        }
+        .entry-card .card-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #2a4a5a;
+            word-break: break-word;
+            flex: 1;
+        }
+        .entry-card .card-status {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 0.1rem 0.5rem;
+            border-radius: 100px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .entry-card .card-meta {
+            font-size: 0.75rem;
+            color: #5a7a8a;
+            margin: 0.2rem 0 0.4rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem 0.6rem;
+        }
+        .entry-card .card-actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            margin-top: auto;
+        }
+        .entry-card .card-actions button {
+            border: none;
+            background: rgba(180, 210, 230, 0.15);
+            padding: 0.15rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #4a6a7a;
+            cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            flex: 1 0 auto;
+            justify-content: center;
+            border: 1px solid transparent;
+        }
+        .entry-card .card-actions button:hover {
+            background: rgba(180, 210, 230, 0.25);
+            transform: scale(1.02);
+        }
+        .entry-card .card-actions .btn-inc {
+            background: rgba(120, 200, 160, 0.15);
+            color: #2a6a4a;
+        }
+        .entry-card .card-actions .btn-inc:hover {
+            background: rgba(120, 200, 160, 0.25);
+        }
+        .entry-card .card-actions .btn-dec {
+            background: rgba(200, 150, 150, 0.12);
+            color: #7a4a4a;
+        }
+        .entry-card .card-actions .btn-dec:hover {
+            background: rgba(200, 150, 150, 0.2);
+        }
+        .entry-card .card-actions .btn-edit {
+            background: rgba(160, 180, 230, 0.12);
+            color: #4a5a7a;
+        }
+        .entry-card .card-actions .btn-edit:hover {
+            background: rgba(160, 180, 230, 0.22);
+        }
+        .entry-card .card-actions .btn-delete {
+            background: rgba(200, 120, 120, 0.08);
+            color: #8a5a5a;
+        }
+        .entry-card .card-actions .btn-delete:hover {
+            background: rgba(200, 120, 120, 0.18);
+            color: #b04040;
+        }
+
+        /* ===== 标签 ===== */
+        .tag {
+            display: inline-block;
+            padding: 0.15rem 0.7rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .tag-red {
+            background: #f8d0d0;
+            color: #8a3a3a;
+        }
+        .tag-orange {
+            background: #f5e0b0;
+            color: #7a5a1a;
+        }
+        .tag-green {
+            background: #c8e6c8;
+            color: #1a6a3a;
+        }
+        .tag-blue {
+            background: #c0d8f0;
+            color: #1a4a7a;
+        }
+        .tag-purple {
+            background: #d4c0f0;
+            color: #4a2a6a;
+        }
+
+        /* ===== 状态颜色（蓝色调） ===== */
+        .status-watching {
+            background: #c0d8f0;
+            color: #1a4a7a;
+        }
+        .status-completed {
+            background: #b5e6c3;
+            color: #1d6a3a;
+        }
+        .status-on-hold {
+            background: #f7e5b0;
+            color: #7a5a1a;
+        }
+        .status-planning {
+            background: #c0d8f0;
+            color: #1a4a7a;
+        }
+        .status-dropped {
+            background: #f0c8c8;
+            color: #7a2a2a;
+        }
+        .status-reading {
+            background: #c0d8f0;
+            color: #1a4a7a;
+        }
+
+        /* ===== 日历 ===== */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-top: 0.5rem;
+        }
+        .calendar-day {
+            background: rgba(240, 248, 255, 0.6);
+            border-radius: 14px;
+            padding: 0.3rem 0.2rem 0.1rem;
+            min-height: 70px;
+            text-align: center;
+            font-size: 0.75rem;
+            border: 1px solid rgba(180, 210, 230, 0.2);
+            transition: 0.15s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .calendar-day:hover {
+            background: rgba(180, 210, 230, 0.15);
+        }
+        .calendar-day .day-num {
+            font-weight: 700;
+            color: #2a4a5a;
+            font-size: 0.85rem;
+            margin-bottom: 2px;
+        }
+        .calendar-day .day-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            margin-top: auto;
+            padding-bottom: 2px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        .calendar-day .day-bar {
+            height: 4px;
+            border-radius: 2px;
+            margin: 0 2px;
+        }
+        .calendar-day .empty-img {
+            font-size: 0.6rem;
+            color: #a0b8c8;
+        }
+        .calendar-weekday {
+            text-align: center;
+            font-weight: 700;
+            color: #4a7a8a;
+            font-size: 0.8rem;
+            padding: 0.2rem 0;
+        }
+
+        /* ===== 汇总条 ===== */
+        .summary-box {
+            background: rgba(180, 210, 230, 0.08);
+            padding: 0.6rem 1rem;
+            border-radius: 16px;
+            margin-top: 0.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem 1.5rem;
+        }
+        .summary-box span {
+            font-weight: 600;
+            color: #2a4a5a;
+        }
+
+        /* ===== 模态框 ===== */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(40, 60, 80, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 999;
+            padding: 1rem;
+            animation: fadeIn 0.25s ease;
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            max-width: 520px;
+            width: 100%;
+            padding: 1.8rem 2rem 1.8rem;
+            border-radius: 2.4rem;
+            box-shadow: 0 30px 80px rgba(60, 100, 130, 0.15);
+            border: 1px solid rgba(200, 225, 240, 0.5);
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        .modal-box h3 {
+            font-size: 1.3rem;
+            color: #2a5a7a;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .modal-box .row {
+            margin-bottom: 0.8rem;
+        }
+        .modal-box .row label {
+            min-width: 70px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 0.6rem;
+            margin-top: 1.2rem;
+            justify-content: flex-end;
+        }
+        .modal-actions button {
+            padding: 0.5rem 1.6rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal-actions .btn-modal-save {
+            background: #7ab8d4;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(100, 170, 200, 0.2);
+        }
+        .modal-actions .btn-modal-save:hover {
+            background: #6aa8c4;
+            transform: scale(1.02);
+        }
+        .modal-actions .btn-modal-cancel {
+            background: rgba(180, 210, 230, 0.15);
+            color: #4a6a7a;
+        }
+        .modal-actions .btn-modal-cancel:hover {
+            background: rgba(180, 210, 230, 0.25);
+        }
+
+        /* ===== 筛选/标签 ===== */
+        .filter-group {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.8rem;
+        }
+        .filter-group .filter-btn {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(180, 210, 230, 0.3);
+            padding: 0.2rem 1.2rem;
+            border-radius: 100px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #4a6a7a;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .filter-group .filter-btn:hover {
+            background: rgba(180, 210, 230, 0.2);
+        }
+        .filter-group .filter-btn.active {
+            background: #7ab8d4;
+            border-color: #7ab8d4;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(100, 170, 200, 0.2);
+        }
+        .filter-group .filter-btn .badge {
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 100px;
+            padding: 0 0.4rem;
+            font-size: 0.65rem;
+            margin-left: 0.2rem;
+        }
+        .filter-group .filter-btn.active .badge {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* ===== 事件样式 ===== */
+        .event-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem 0.8rem;
+            background: rgba(240, 248, 255, 0.5);
+            border-radius: 16px;
+            margin-bottom: 0.4rem;
+            border-left: 4px solid #7ab8d4;
+            transition: 0.15s;
+        }
+        .event-item:hover {
+            background: rgba(240, 248, 255, 0.8);
+        }
+        .event-item .event-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid #b0c8d8;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+            background: #fff;
+        }
+        .event-item .event-check.done {
+            background: #7ab8d4;
+            border-color: #7ab8d4;
+            color: #fff;
+            font-size: 12px;
+        }
+        .event-item .event-check.done::after {
+            content: "✓";
+        }
+        .event-item .event-text {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #2a4a5a;
+        }
+        .event-item .event-text.done-text {
+            text-decoration: line-through;
+            color: #a0b8c8;
+        }
+        .event-item .event-meta {
+            font-size: 0.7rem;
+            color: #7a9aaa;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .event-item .event-actions {
+            display: flex;
+            gap: 0.3rem;
+        }
+        .event-item .event-actions button {
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 0.7rem;
+            color: #7a9aaa;
+            padding: 0.1rem 0.3rem;
+            border-radius: 8px;
+            transition: 0.15s;
+        }
+        .event-item .event-actions button:hover {
+            background: rgba(180, 210, 230, 0.2);
+            color: #2a5a7a;
+        }
+        .event-item .event-priority {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.5rem;
+            border-radius: 100px;
+            font-weight: 700;
+        }
+        .event-priority-high {
+            background: #f8d0d0;
+            color: #8a3a3a;
+        }
+        .event-priority-medium {
+            background: #f5e0b0;
+            color: #7a5a1a;
+        }
+        .event-priority-low {
+            background: #c8e6c8;
+            color: #1a6a3a;
+        }
+
+        /* ===== 子标签 ===== */
+        .sub-tabs {
+            display: flex;
+            gap: 0.2rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid rgba(180, 210, 230, 0.2);
+        }
+        .sub-tabs .sub-tab {
+            background: transparent;
+            border: none;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #5a7a8a;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .sub-tabs .sub-tab:hover {
+            background: rgba(180, 210, 230, 0.1);
+        }
+        .sub-tabs .sub-tab.active {
+            background: rgba(180, 210, 230, 0.2);
+            color: #3a7a9a;
+        }
+
+        /* ===== 标签栏（可点击筛选） ===== */
+        .event-tag-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem 0.8rem;
+            margin-bottom: 0.8rem;
+            padding: 0.3rem 0;
+        }
+        .event-tag-bar .etag {
+            font-size: 0.75rem;
+            padding: 0.15rem 0.8rem;
+            border-radius: 100px;
+            background: rgba(180, 210, 230, 0.08);
+            color: #4a6a7a;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        .event-tag-bar .etag:hover {
+            background: rgba(180, 210, 230, 0.2);
+        }
+        .event-tag-bar .etag.active {
+            background: #7ab8d4;
+            color: #fff;
+            border-color: #7ab8d4;
+        }
+        .event-tag-bar .etag .num {
+            font-weight: 700;
+            margin-left: 0.2rem;
+        }
+
+        /* ===== 饼图 ===== */
+        .pie-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            margin-top: 0.5rem;
+        }
+        .pie-canvas-wrap {
+            position: relative;
+            width: 180px;
+            height: 180px;
+        }
+        .pie-canvas-wrap canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+        }
+        .pie-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            font-size: 0.75rem;
+        }
+        .pie-legend .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .pie-legend .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        /* ===== 分类管理标签（可点击筛选） ===== */
+        .cat-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(180, 210, 230, 0.12);
+            padding: 0.15rem 0.6rem;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            color: #4a6a7a;
+            cursor: pointer;
+            transition: 0.15s;
+            border: 1px solid transparent;
+        }
+        .cat-tag:hover {
+            background: rgba(180, 210, 230, 0.25);
+        }
+        .cat-tag.active {
+            background: #7ab8d4;
+            color: #fff;
+            border-color: #7ab8d4;
+        }
+        .cat-tag .cat-del {
+            cursor: pointer;
+            color: #d09a9a;
+            font-weight: 700;
+            font-size: 0.7rem;
+            margin-left: 0.2rem;
+        }
+        .cat-tag .cat-del:hover {
+            color: #b07070;
+        }
+
+        /* ===== 日期导航 ===== */
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .date-nav button {
+            background: rgba(180, 210, 230, 0.08);
+            border: none;
+            padding: 0.2rem 0.8rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            color: #4a6a7a;
+            transition: 0.15s;
+        }
+        .date-nav button:hover {
+            background: rgba(180, 210, 230, 0.2);
+        }
+        .date-nav .date-label {
+            font-weight: 600;
+            color: #2a4a5a;
+            font-size: 0.85rem;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        /* ===== 总结区域 ===== */
+        .summary-textarea {
+            width: 100%;
+            border-radius: 24px;
+            border: 1px solid rgba(180, 210, 230, 0.3);
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.6);
+            outline: none;
+            transition: 0.25s;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+        }
+        .summary-textarea:focus {
+            border-color: #7ab8d4;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(130, 190, 220, 0.12);
+        }
+        .summary-display {
+            margin-top: 0.3rem;
+            font-style: italic;
+            color: #5a7a8a;
+            padding: 0.3rem 0.6rem;
+            background: rgba(240, 248, 255, 0.3);
+            border-radius: 12px;
+        }
+
+        /* ===== 视图切换标签 ===== */
+        .view-tabs {
+            display: flex;
+            gap: 0.3rem;
+            margin-bottom: 0.8rem;
+        }
+        .view-tabs .view-tab {
+            background: transparent;
+            border: none;
+            padding: 0.2rem 0.8rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #5a7a8a;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .view-tabs .view-tab:hover {
+            background: rgba(180, 210, 230, 0.1);
+        }
+        .view-tabs .view-tab.active {
+            background: rgba(180, 210, 230, 0.2);
+            color: #3a7a9a;
+        }
+        .event-type-badge {
+            font-size: 0.6rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 100px;
+            background: rgba(180, 210, 230, 0.2);
+            color: #3a6a7a;
+        }
+
+        /* ===== 响应式 ===== */
+        @media (max-width: 640px) {
+            .app {
+                padding: 1rem;
+                border-radius: 1.6rem;
+            }
+            .header-title {
+                font-size: 1.5rem;
+            }
+            .tab-btn {
+                font-size: 0.7rem;
+                padding: 0.3rem 0.7rem;
+            }
+            .row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .row label {
+                min-width: unset;
+            }
+            .grid-cards {
+                grid-template-columns: 1fr;
+            }
+            .calendar-grid {
+                grid-template-columns: repeat(7, 1fr);
+                gap: 2px;
+            }
+            .calendar-day {
+                min-height: 50px;
+                padding: 0.2rem 0.1rem;
+                font-size: 0.6rem;
+            }
+            .calendar-day .day-bar {
+                height: 3px;
+            }
+            .modal-box {
+                padding: 1.2rem;
+            }
+            .pie-canvas-wrap {
+                width: 140px;
+                height: 140px;
+            }
+            .event-item {
+                flex-wrap: wrap;
+                gap: 0.3rem;
+            }
+            .event-item .event-meta {
+                width: 100%;
+                margin-left: 2.2rem;
+            }
+        }
+        @media (min-width: 641px) and (max-width: 1024px) {
+            .calendar-day {
+                min-height: 60px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(180, 210, 230, 0.05);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #b0c8d8;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9ab8c8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+        <div class="header-title">📚 我的全能备忘录</div>
+
+        <!-- 主标签 -->
+        <div class="tabs" id="tabHeaders">
+            <button class="tab-btn active" data-tab="events">📋 事件</button>
+            <button class="tab-btn" data-tab="draw">🎨 绘画</button>
+            <button class="tab-btn" data-tab="anime">📺 追番</button>
+            <button class="tab-btn" data-tab="drama">🎬 追剧</button>
+            <button class="tab-btn" data-tab="novel">📖 小说</button>
+            <button class="tab-btn" data-tab="items">🧴 物品</button>
+            <button class="tab-btn" data-tab="ledger">💰 记账</button>
+            <button class="tab-btn" data-tab="game">🎮 游戏</button>
+        </div>
+
+        <div class="tab-content">
+
+            <!-- ========================================================= -->
+            <!-- 事件模块（升级版：清单+可视化） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane active" id="pane-events">
+                <div class="sub-tabs" id="eventSubTabs">
+                    <button class="sub-tab active" data-sub="work">💼 工作</button>
+                    <button class="sub-tab" data-sub="life">🌿 生活</button>
+                </div>
+
+                <div id="eventWorkContent">
+                    <!-- 快速添加 -->
+                    <div class="card">
+                        <h3>⚡ 快速添加</h3>
+                        <div class="row">
+                            <input type="text" id="eventQuickName" placeholder="事件名称" style="flex:2;" />
+                            <select id="eventQuickType">
+                                <option value="task">📋 清单日程</option>
+                                <option value="event">📅 可视化日程</option>
+                            </select>
+                        </div>
+                        <!-- 清单日程字段 -->
+                        <div id="taskFields" class="row">
+                            <input type="date" id="eventQuickDate" style="flex:1;" />
+                            <input type="time" id="eventQuickTime" style="flex:0.6;" />
+                            <select id="eventQuickPriority">
+                                <option value="high">🔴 紧急</option>
+                                <option value="medium" selected>🟠 重要</option>
+                                <option value="low">🟢 普通</option>
+                            </select>
+                            <select id="eventQuickCategory">
+                                <option value="工作">💼 工作</option>
+                                <option value="生活">🌿 生活</option>
+                            </select>
+                            <button class="btn btn-sm" id="addEventQuick">➕ 添加</button>
+                        </div>
+                        <!-- 可视化日程字段 -->
+                        <div id="eventFields" class="row" style="display:none;">
+                            <input type="datetime-local" id="eventQuickStart" style="flex:1;" />
+                            <input type="datetime-local" id="eventQuickEnd" style="flex:1;" />
+                            <input type="color" id="eventQuickColor" value="#7ab8d4" style="flex:0 0 50px;" />
+                            <select id="eventQuickPriorityEvent">
+                                <option value="high">🔴 紧急</option>
+                                <option value="medium" selected>🟠 重要</option>
+                                <option value="low">🟢 普通</option>
+                            </select>
+                            <select id="eventQuickCategoryEvent">
+                                <option value="工作">💼 工作</option>
+                                <option value="生活">🌿 生活</option>
+                            </select>
+                            <button class="btn btn-sm" id="addEventQuickEvent">➕ 添加</button>
+                        </div>
+                    </div>
+
+                    <!-- 当天事件 -->
+                    <div class="card">
+                        <h3>📅 当天事件</h3>
+                        <div class="date-nav">
+                            <button id="eventDayPrev">◀</button>
+                            <span class="date-label" id="eventDayLabel">今天</span>
+                            <button id="eventDayNext">▶</button>
+                            <button class="btn-sm btn-outline" id="eventDayToday">今天</button>
+                            <input type="date" id="eventDayPicker" style="flex:0 0 auto;width:auto;padding:0.2rem 0.5rem;font-size:0.75rem;" />
+                            <button class="btn-sm btn-outline" id="eventDayGo">跳转</button>
+                        </div>
+                        <div class="view-tabs" id="dayViewTabs">
+                            <button class="view-tab active" data-view="list">📋 清单日程</button>
+                            <button class="view-tab" data-view="calendar">📅 可视化日程</button>
+                        </div>
+                        <div id="eventDayList"></div>
+                        <div id="eventDayCalendar" style="display:none;"></div>
+                        <div style="margin-top:1rem;border-top:1px solid rgba(180,210,230,0.2);padding-top:0.8rem;">
+                            <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+                                <span style="font-weight:600;color:#4a6a7a;font-size:0.85rem;">📝 当天总结</span>
+                                <textarea id="eventDaySummaryInput" placeholder="写下今天的总结..." style="flex:1;min-width:200px;border-radius:24px;border:1px solid rgba(180,210,230,0.3);padding:0.4rem 0.8rem;font-size:0.85rem;background:rgba(255,255,255,0.6);outline:none;transition:0.25s;resize:vertical;min-height:40px;"></textarea>
+                                <button class="btn btn-sm" id="saveEventDaySummary">💾 保存</button>
+                            </div>
+                            <div id="eventDaySummaryDisplay" class="summary-display"></div>
+                        </div>
+                    </div>
+
+                    <!-- 当周事件 -->
+                    <div class="card">
+                        <h3>📆 当周事件 <span style="font-size:0.7rem;font-weight:400;color:#7a9aaa;" id="weekLabel"></span></h3>
+                        <div class="date-nav">
+                            <button id="eventWeekPrev">◀</button>
+                            <span class="date-label" id="eventWeekLabel">本周</span>
+                            <button id="eventWeekNext">▶</button>
+                            <button class="btn-sm btn-outline" id="eventWeekToday">本周</button>
+                        </div>
+                        <div class="view-tabs" id="weekViewTabs">
+                            <button class="view-tab active" data-view="list">📋 清单日程</button>
+                            <button class="view-tab" data-view="calendar">📅 可视化日程</button>
+                        </div>
+                        <div id="eventWeekList"></div>
+                        <div id="eventWeekCalendar" style="display:none;"></div>
+                    </div>
+
+                    <!-- 当月事件 -->
+                    <div class="card">
+                        <h3>📊 当月事件</h3>
+                        <div class="date-nav">
+                            <button id="eventMonthPrev">◀</button>
+                            <span class="date-label" id="eventMonthLabel">本月</span>
+                            <button id="eventMonthNext">▶</button>
+                            <button class="btn-sm btn-outline" id="eventMonthToday">本月</button>
+                        </div>
+                        <div class="view-tabs" id="monthViewTabs">
+                            <button class="view-tab active" data-view="list">📋 清单日程</button>
+                            <button class="view-tab" data-view="calendar">📅 可视化日程</button>
+                        </div>
+                        <div id="eventMonthList"></div>
+                        <div id="eventMonthCalendar" style="display:none;"></div>
+                    </div>
+
+                    <!-- 年度总结 -->
+                    <div class="card">
+                        <h3>📅 年度总结</h3>
+                        <div style="display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+                            <input type="number" id="eventYearInput" placeholder="年份" value="2026" style="width:100px;border-radius:24px;border:1px solid rgba(180,210,230,0.3);padding:0.4rem 0.8rem;font-size:0.85rem;background:rgba(255,255,255,0.6);outline:none;" />
+                            <button class="btn btn-sm" id="loadYearSummary">📂 加载</button>
+                            <span style="font-size:0.8rem;color:#7a9aaa;">（点击加载查看该年总结）</span>
+                        </div>
+                        <div style="margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;">
+                            <textarea id="eventYearSummaryInput" placeholder="写下这一年的总结..." style="flex:1;min-width:200px;border-radius:24px;border:1px solid rgba(180,210,230,0.3);padding:0.4rem 0.8rem;font-size:0.85rem;background:rgba(255,255,255,0.6);outline:none;transition:0.25s;resize:vertical;min-height:60px;"></textarea>
+                            <button class="btn btn-sm" id="saveEventYearSummary">💾 保存</button>
+                        </div>
+                        <div id="eventYearSummaryDisplay" class="summary-display"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 绘画模块（不变） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-draw">
+                <div class="card">
+                    <h3>🎨 绘画板块</h3>
+                    <div class="row">
+                        <select id="drawCategory">
+                            <option value="practice">✏️ 练习</option>
+                            <option value="commission">💼 接单</option>
+                        </select>
+                        <input type="month" id="drawMonth" />
+                        <button class="btn btn-sm" id="loadDrawCalendar">📅 加载日历</button>
+                    </div>
+                    <div id="drawCalendarContainer"></div>
+                    <div style="margin-top:0.8rem;">
+                        <button class="btn btn-sm" id="generateYearlyDraw">📸 生成年度拼图（预览）</button>
+                        <div id="yearlyPreview" style="margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:4px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 追番模块（与之前完全一致） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-anime">
+                <div class="card">
+                    <h3>📺 追番记录</h3>
+                    <div class="event-tag-bar" id="animeRegionBar"></div>
+                    <div class="event-tag-bar" id="animeStatusBar"></div>
+                    <div class="row">
+                        <input type="text" id="animeName" placeholder="番剧名称" />
+                        <input type="text" id="animeEp" placeholder="集数 (如 12/24)" />
+                        <select id="animeStatus">
+                            <option value="watching">在看</option>
+                            <option value="completed">已看完</option>
+                            <option value="on-hold">搁置</option>
+                            <option value="planning">想追</option>
+                            <option value="dropped">弃番</option>
+                        </select>
+                        <select id="animeRegion">
+                            <option value="国产">🇨🇳 国产</option>
+                            <option value="海外">🌍 海外</option>
+                        </select>
+                        <button class="btn btn-sm" id="addAnime">➕ 添加</button>
+                    </div>
+                    <div id="animeGrid" class="grid-cards"></div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 追剧模块（与之前完全一致） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-drama">
+                <div class="card">
+                    <h3>🎬 追剧记录</h3>
+                    <div class="event-tag-bar" id="dramaRegionBar"></div>
+                    <div class="event-tag-bar" id="dramaStatusBar"></div>
+                    <div class="row">
+                        <input type="text" id="dramaName" placeholder="剧名" />
+                        <input type="text" id="dramaEp" placeholder="集数" />
+                        <select id="dramaStatus">
+                            <option value="watching">在看</option>
+                            <option value="completed">已看完</option>
+                            <option value="on-hold">搁置</option>
+                            <option value="planning">想追</option>
+                            <option value="dropped">弃剧</option>
+                        </select>
+                        <select id="dramaRegion">
+                            <option value="国产">🇨🇳 国产</option>
+                            <option value="海外">🌍 海外</option>
+                        </select>
+                        <button class="btn btn-sm" id="addDrama">➕ 添加</button>
+                    </div>
+                    <div id="dramaGrid" class="grid-cards"></div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 小说模块（与之前完全一致） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-novel">
+                <div class="card">
+                    <h3>📖 小说记录</h3>
+                    <div class="event-tag-bar" id="novelStatusBar"></div>
+                    <div class="row">
+                        <input type="text" id="novelName" placeholder="小说名" />
+                        <input type="text" id="novelChapter" placeholder="章节数" />
+                        <select id="novelStatus">
+                            <option value="reading">在读</option>
+                            <option value="completed">已读完</option>
+                            <option value="on-hold">搁置</option>
+                            <option value="planning">想读</option>
+                            <option value="dropped">弃书</option>
+                        </select>
+                        <button class="btn btn-sm" id="addNovel">➕ 添加</button>
+                    </div>
+                    <div id="novelGrid" class="grid-cards"></div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 物品模块（与之前完全一致） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-items">
+                <div class="card">
+                    <h3>🧴 物品管理</h3>
+                    <div class="row">
+                        <input type="text" id="itemName" placeholder="物品名称" />
+                        <input type="number" id="itemPrice" placeholder="价格" step="0.01" />
+                        <input type="number" id="itemDays" placeholder="使用天数" />
+                        <select id="itemCategorySelect"></select>
+                        <select id="itemStatus">
+                            <option value="using">使用中</option>
+                            <option value="used">已用完</option>
+                            <option value="discarded">已丢弃</option>
+                        </select>
+                        <button class="btn btn-sm" id="addItem">➕ 添加</button>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;align-items:center;">
+                        <span style="font-size:0.75rem;color:#4a6a7a;">📂 分类（点击筛选）：</span>
+                        <div id="itemCatTags" style="display:flex;flex-wrap:wrap;gap:0.3rem;"></div>
+                        <input type="text" id="itemNewCat" placeholder="新分类" style="flex:0 0 auto;width:120px;padding:0.2rem 0.6rem;border-radius:24px;border:1px solid rgba(180,210,230,0.3);font-size:0.75rem;background:rgba(255,255,255,0.6);outline:none;" />
+                        <button class="btn btn-sm" id="addItemCat">➕ 新增</button>
+                    </div>
+                    <div id="itemGrid" class="grid-cards"></div>
+                    <div id="itemSummary" class="summary-box">分类汇总：加载中...</div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 记账模块（与之前完全一致） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-ledger">
+                <div class="card">
+                    <h3>💰 记账</h3>
+                    <div class="filter-group" id="ledgerSummaryTabs">
+                        <button class="filter-btn active" data-summary="day">📅 当天汇总</button>
+                        <button class="filter-btn" data-summary="week">📅 本周汇总</button>
+                        <button class="filter-btn" data-summary="month">📅 本月汇总</button>
+                        <button class="filter-btn" data-summary="year">📅 本年汇总</button>
+                    </div>
+                    <div id="ledgerSummaryContent" style="margin-bottom:0.8rem;"></div>
+
+                    <div class="row">
+                        <select id="ledgerType">
+                            <option value="income">📈 进账</option>
+                            <option value="expense">📉 支出</option>
+                        </select>
+                        <select id="ledgerCategorySelect"></select>
+                        <input type="text" id="ledgerName" placeholder="名称" />
+                        <input type="number" id="ledgerAmount" placeholder="金额" step="0.01" />
+                        <input type="date" id="ledgerDate" />
+                        <button class="btn btn-sm" id="addLedger">➕ 记录</button>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem;align-items:center;">
+                        <span style="font-size:0.75rem;color:#4a6a7a;">📂 分类（点击筛选）：</span>
+                        <div id="ledgerCatTags" style="display:flex;flex-wrap:wrap;gap:0.3rem;"></div>
+                        <input type="text" id="ledgerNewCat" placeholder="新分类" style="flex:0 0 auto;width:120px;padding:0.2rem 0.6rem;border-radius:24px;border:1px solid rgba(180,210,230,0.3);font-size:0.75rem;background:rgba(255,255,255,0.6);outline:none;" />
+                        <button class="btn btn-sm" id="addLedgerCat">➕ 新增</button>
+                    </div>
+                    <div id="ledgerGrid" class="grid-cards"></div>
+                </div>
+            </div>
+
+            <!-- ========================================================= -->
+            <!-- 游戏模块（占位） -->
+            <!-- ========================================================= -->
+            <div class="tab-pane" id="pane-game">
+                <div class="card" style="text-align:center;padding:3rem 1rem;">
+                    <span style="font-size:4rem;">🎮</span>
+                    <h3>游戏备忘录</h3>
+                    <p style="color:#7a9aaa;margin-top:0.5rem;">此模块功能开发中，敬请期待！</p>
+                </div>
+            </div>
+
+        </div><!-- end tab-content -->
+    </div><!-- end app -->
+
+    <!-- ===== 模态框（全局编辑） ===== -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-box">
+            <h3 id="editModalTitle">✏️ 编辑</h3>
+            <form id="editForm">
+                <div id="editFields"></div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-modal-cancel" id="modalCancel">取消</button>
+                    <button type="submit" class="btn-modal-save">💾 保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // =============================================================
+            //  工具函数
+            // =============================================================
+            function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+            function save(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+            function load(key) {
+                try { return JSON.parse(localStorage.getItem(key)) || null; } catch (_) { return null; }
+            }
+
+            function getData(key, def) { const d = load(key); return d !== null ? d : def; }
+
+            function formatDate(d) {
+                const dt = new Date(d);
+                return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+            }
+
+            function formatDateCN(d) {
+                const dt = new Date(d);
+                return `${dt.getFullYear()}年${dt.getMonth()+1}月${dt.getDate()}日`;
+            }
+
+            function getWeekNumber(d) {
+                const dt = new Date(d);
+                const start = new Date(dt.getFullYear(), 0, 1);
+                const diff = (dt - start + (start.getTimezoneOffset() - dt.getTimezoneOffset()) * 60000) / 86400000;
+                return Math.ceil((diff + start.getDay() + 1) / 7);
+            }
+
+            function getWeekRange(d) {
+                const dt = new Date(d);
+                const day = dt.getDay() || 7;
+                const start = new Date(dt);
+                start.setDate(dt.getDate() - day + 1);
+                const end = new Date(start);
+                end.setDate(start.getDate() + 6);
+                return { start, end };
+            }
+
+            function isToday(d) {
+                const today = new Date();
+                return d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today
+                    .getDate();
+            }
+
+            function sameDay(d1, d2) {
+                return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2
+                    .getDate();
+            }
+
+            // 状态映射（用于追番追剧小说）
+            const statusClassMap = {
+                'watching': 'status-watching',
+                'completed': 'status-completed',
+                'on-hold': 'status-on-hold',
+                'planning': 'status-planning',
+                'dropped': 'status-dropped',
+                'reading': 'status-reading',
+                'using': 'status-watching',
+                'used': 'status-completed',
+                'discarded': 'status-dropped'
+            };
+
+            // =============================================================
+            //  标签切换
+            // =============================================================
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const panes = {
+                events: document.getElementById('pane-events'),
+                draw: document.getElementById('pane-draw'),
+                anime: document.getElementById('pane-anime'),
+                drama: document.getElementById('pane-drama'),
+                novel: document.getElementById('pane-novel'),
+                items: document.getElementById('pane-items'),
+                ledger: document.getElementById('pane-ledger'),
+                game: document.getElementById('pane-game')
+            };
+
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    const tab = this.dataset.tab;
+                    Object.keys(panes).forEach(k => panes[k].classList.toggle('active', k === tab));
+                    if (tab === 'draw') renderDrawCalendar();
+                    if (tab === 'items') { renderItems();
+                        renderItemCatTags(); }
+                    if (tab === 'ledger') { renderLedger();
+                        renderLedgerCatTags();
+                        updateLedgerSummary('day'); }
+                    if (tab === 'anime') { renderAnime();
+                        renderAnimeTags(); }
+                    if (tab === 'drama') { renderDrama();
+                        renderDramaTags(); }
+                    if (tab === 'novel') { renderNovel();
+                        renderNovelStatusBar(); }
+                    if (tab === 'events') { renderEvents();
+                        loadEventDaySummary();
+                        loadEventYearSummary(); }
+                });
+            });
+
+            // =============================================================
+            //  模态框（通用）
+            // =============================================================
+            const editModal = document.getElementById('editModal');
+            const editForm = document.getElementById('editForm');
+            const editFields = document.getElementById('editFields');
+            const modalTitle = document.getElementById('editModalTitle');
+            const modalCancel = document.getElementById('modalCancel');
+            let currentEditData = null;
+
+            function openEditModal(module, id, fields, title) {
+                currentEditData = { module, id, fields };
+                modalTitle.textContent = title || '✏️ 编辑';
+                let html = '';
+                fields.forEach(f => {
+                    const label = f.label || f.key;
+                    const value = f.value !== undefined ? f.value : '';
+                    let input = '';
+                    if (f.type === 'select') {
+                        const opts = f.options.map(o =>
+                            `<option value="${o.value}" ${o.value===value?'selected':''}>${o.text}</option>`
+                        ).join('');
+                        input =
+                            `<select id="edit_${f.key}" class="edit-field" data-key="${f.key}">${opts}</select>`;
+                    } else if (f.type === 'date') {
+                        input = `<input type="date" id="edit_${f.key}" class="edit-field" data-key="${f.key}" value="${value}" />`;
+                    } else if (f.type === 'datetime-local') {
+                        input =
+                            `<input type="datetime-local" id="edit_${f.key}" class="edit-field" data-key="${f.key}" value="${value}" />`;
+                    } else if (f.type === 'color') {
+                        input =
+                            `<input type="color" id="edit_${f.key}" class="edit-field" data-key="${f.key}" value="${value}" style="flex:0 0 50px;height:40px;border-radius:50%;padding:0.2rem;" />`;
+                    } else if (f.type === 'textarea') {
+                        input =
+                            `<textarea id="edit_${f.key}" class="edit-field" data-key="${f.key}" rows="2">${value}</textarea>`;
+                    } else {
+                        input =
+                            `<input type="${f.type||'text'}" id="edit_${f.key}" class="edit-field" data-key="${f.key}" value="${value}" ${f.step?`step="${f.step}"`:''} />`;
+                    }
+                    html += `<div class="row"><label>${label}</label>${input}</div>`;
+                });
+                editFields.innerHTML = html;
+                editModal.classList.add('show');
+            }
+
+            function closeEditModal() { editModal.classList.remove('show');
+                currentEditData = null; }
+            modalCancel.addEventListener('click', closeEditModal);
+            editModal.addEventListener('click', function(e) { if (e.target === this) closeEditModal(); });
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && editModal.classList.contains('show'))
+                    closeEditModal(); });
+
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentEditData) return;
+                const { module, id, fields } = currentEditData;
+                const updates = {};
+                fields.forEach(f => {
+                    const el = document.getElementById(`edit_${f.key}`);
+                    if (el) {
+                        let val = el.value;
+                        if (f.type === 'number') val = parseFloat(val) || 0;
+                        updates[f.key] = val;
+                    }
+                });
+                let success = false;
+                if (module === 'event') success = updateEvent(id, updates);
+                else if (module === 'anime') success = updateAnime(id, updates);
+                else if (module === 'drama') success = updateDrama(id, updates);
+                else if (module === 'novel') success = updateNovel(id, updates);
+                else if (module === 'item') success = updateItem(id, updates);
+                else if (module === 'ledger') success = updateLedger(id, updates);
+                if (success) {
+                    closeEditModal();
+                    if (module === 'event') renderEvents();
+                    else if (module === 'anime') { renderAnime();
+                        renderAnimeTags(); } else if (module === 'drama') { renderDrama();
+                        renderDramaTags(); } else if (module === 'novel') { renderNovel();
+                        renderNovelStatusBar(); } else if (module === 'item') { renderItems();
+                        renderItemCatTags(); } else if (module === 'ledger') { renderLedger();
+                        renderLedgerCatTags();
+                        updateLedgerSummary(document.querySelector('#ledgerSummaryTabs .active')?.dataset.summary ||
+                            'day'); }
+                }
+            });
+
+            // =============================================================
+            //  1. 事件模块（升级版）
+            // =============================================================
+            const EVENTS_KEY = 'events_data';
+            const EVENT_DAY_SUMMARY_KEY = 'event_day_summary';
+            const EVENT_YEAR_SUMMARY_KEY = 'event_year_summary';
+            let events = getData(EVENTS_KEY, []);
+            events = events.map(e => {
+                if (!e.type) e.type = 'task';
+                if (e.type === 'task' && !e.date) e.date = formatDate(new Date());
+                return e;
+            });
+            save(EVENTS_KEY, events);
+
+            let eventSub = 'work';
+            let eventDayView = new Date();
+            let eventWeekView = new Date();
+            let eventMonthView = new Date();
+
+            document.querySelectorAll('#eventSubTabs .sub-tab').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#eventSubTabs .sub-tab').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    eventSub = this.dataset.sub;
+                    renderEvents();
+                });
+            });
+
+            document.getElementById('eventQuickType').addEventListener('change', function() {
+                const type = this.value;
+                document.getElementById('taskFields').style.display = type === 'task' ? 'flex' : 'none';
+                document.getElementById('eventFields').style.display = type === 'event' ? 'flex' : 'none';
+            });
+
+            function getEventsBySub(sub) {
+                return events.filter(e => e.sub === sub);
+            }
+
+            function renderEvents() {
+                renderEventDay();
+                renderEventWeek();
+                renderEventMonth();
+            }
+
+            // ---- 当天 ----
+            function renderEventDay() {
+                const dateStr = formatDate(eventDayView);
+                document.getElementById('eventDayLabel').textContent = formatDateCN(eventDayView) + (isToday(eventDayView) ?
+                    ' (今天)' : '');
+
+                const dayEvents = getEventsBySub(eventSub).filter(e => {
+                    if (e.type === 'task') {
+                        return e.date === dateStr;
+                    } else {
+                        const start = new Date(e.startDate);
+                        const end = new Date(e.endDate);
+                        const day = new Date(eventDayView);
+                        return day >= start && day <= end;
+                    }
+                });
+
+                renderDayList(dayEvents);
+                renderDayCalendar(dayEvents);
+            }
+
+            function renderDayList(dayEvents) {
+                const container = document.getElementById('eventDayList');
+                const tasks = dayEvents.filter(e => e.type === 'task');
+                const eventsList = dayEvents.filter(e => e.type === 'event');
+                if (!tasks.length && !eventsList.length) {
+                    container.innerHTML = '<div style="color:#a0b8c8;font-size:0.85rem;padding:0.5rem 0;">今天暂无事件 ✨</div>';
+                    return;
+                }
+                let html = '';
+                tasks.forEach((e, idx) => {
+                    const done = e.done || false;
+                    const priCls = e.priority === 'high' ? 'event-priority-high' : e.priority === 'medium' ?
+                        'event-priority-medium' : 'event-priority-low';
+                    const priText = e.priority === 'high' ? '紧急' : e.priority === 'medium' ? '重要' : '普通';
+                    html += `<div class="event-item" style="border-left-color:#7ab8d4;">
+                                <div class="event-check ${done?'done':''}" data-idx="${idx}" data-action="toggle-day"></div>
+                                <span class="event-text ${done?'done-text':''}">${e.name}</span>
+                                <span class="event-meta">
+                                    <span>${e.time||'--:--'}</span>
+                                    <span class="event-priority ${priCls}">${priText}</span>
+                                    <span class="event-type-badge">📋</span>
+                                    <span>🏷️ ${e.category||'未分类'}</span>
+                                </span>
+                                <div class="event-actions">
+                                    <button data-action="edit-day" data-idx="${idx}">✏️</button>
+                                    <button data-action="delete-day" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                eventsList.forEach((e, idx) => {
+                    const done = e.done || false;
+                    const priCls = e.priority === 'high' ? 'event-priority-high' : e.priority === 'medium' ?
+                        'event-priority-medium' : 'event-priority-low';
+                    const priText = e.priority === 'high' ? '紧急' : e.priority === 'medium' ? '重要' : '普通';
+                    const color = e.color || '#7ab8d4';
+                    html += `<div class="event-item" style="border-left-color:${color};">
+                                <div class="event-check ${done?'done':''}" data-idx="${idx}" data-action="toggle-day"></div>
+                                <span class="event-text ${done?'done-text':''}">${e.name}</span>
+                                <span class="event-meta">
+                                    <span>${e.startTime||''} - ${e.endTime||''}</span>
+                                    <span class="event-priority ${priCls}">${priText}</span>
+                                    <span class="event-type-badge">📅</span>
+                                    <span>🏷️ ${e.category||'未分类'}</span>
+                                </span>
+                                <div class="event-actions">
+                                    <button data-action="edit-day" data-idx="${idx}">✏️</button>
+                                    <button data-action="delete-day" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                container.innerHTML = html;
+
+                const allDayEvents = dayEvents;
+                container.querySelectorAll('[data-action="toggle-day"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        if (allDayEvents[idx]) {
+                            const origIdx = events.indexOf(allDayEvents[idx]);
+                            if (origIdx !== -1) { events[origIdx].done = !events[origIdx].done;
+                                save(EVENTS_KEY, events);
+                                renderEvents(); }
+                        }
+                    });
+                });
+                container.querySelectorAll('[data-action="edit-day"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = allDayEvents[idx];
+                        if (!item) return;
+                        const origIdx = events.indexOf(item);
+                        if (origIdx === -1) return;
+                        openEditEventModal(origIdx, item);
+                    });
+                });
+                container.querySelectorAll('[data-action="delete-day"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = allDayEvents[idx];
+                        if (!item) return;
+                        const origIdx = events.indexOf(item);
+                        if (origIdx === -1) return;
+                        if (confirm('确定删除？')) { events.splice(origIdx, 1);
+                            save(EVENTS_KEY, events);
+                            renderEvents(); }
+                    });
+                });
+            }
+
+            function renderDayCalendar(dayEvents) {
+                const container = document.getElementById('eventDayCalendar');
+                const day = new Date(eventDayView);
+                const dayOfWeek = day.getDay() || 7;
+                const startOfWeek = new Date(day);
+                startOfWeek.setDate(day.getDate() - dayOfWeek + 1);
+                const endOfWeek = new Date(startOfWeek);
+                endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+                let html = `<div class="calendar-grid">`;
+                const weekdays = ['一', '二', '三', '四', '五', '六', '日'];
+                weekdays.forEach(d => html += `<div class="calendar-weekday">${d}</div>`);
+
+                const weekEvents = events.filter(e => e.type === 'event' && e.sub === eventSub);
+                const dateMap = {};
+                for (let d = new Date(startOfWeek); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
+                    const ds = formatDate(d);
+                    dateMap[ds] = [];
+                }
+                weekEvents.forEach(e => {
+                    const start = new Date(e.startDate);
+                    const end = new Date(e.endDate);
+                    for (let d = new Date(startOfWeek); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
+                        if (d >= start && d <= end) {
+                            const ds = formatDate(d);
+                            if (dateMap[ds]) dateMap[ds].push(e);
+                        }
+                    }
+                });
+
+                for (let d = new Date(startOfWeek); d <= endOfWeek; d.setDate(d.getDate() + 1)) {
+                    const ds = formatDate(d);
+                    const isToday = sameDay(d, eventDayView);
+                    const eventsOnDay = dateMap[ds] || [];
+                    const bars = eventsOnDay.map(e => {
+                        const color = e.color || '#7ab8d4';
+                        return `<div class="day-bar" style="background:${color};"></div>`;
+                    }).join('');
+                    html += `<div class="calendar-day" style="${isToday?'background:rgba(180,210,230,0.3);':''}">
+                                <div class="day-num">${d.getDate()}</div>
+                                <div class="day-bars">${bars}</div>
+                            </div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            // ---- 当周 ----
+            function renderEventWeek() {
+                const range = getWeekRange(eventWeekView);
+                const weekNum = getWeekNumber(eventWeekView);
+                document.getElementById('eventWeekLabel').textContent =
+                    `${formatDateCN(range.start)} ~ ${formatDateCN(range.end)}`;
+                document.getElementById('weekLabel').textContent = `第 ${weekNum} 周`;
+
+                const weekEvents = getEventsBySub(eventSub).filter(e => {
+                    if (e.type === 'task') {
+                        const d = new Date(e.date);
+                        return d >= range.start && d <= range.end;
+                    } else {
+                        const start = new Date(e.startDate);
+                        const end = new Date(e.endDate);
+                        return !(end < range.start || start > range.end);
+                    }
+                });
+
+                renderWeekList(weekEvents);
+                renderWeekCalendar(weekEvents);
+            }
+
+            function renderWeekList(weekEvents) {
+                const container = document.getElementById('eventWeekList');
+                const tasks = weekEvents.filter(e => e.type === 'task');
+                const eventsList = weekEvents.filter(e => e.type === 'event');
+                if (!tasks.length && !eventsList.length) {
+                    container.innerHTML = '<div style="color:#a0b8c8;font-size:0.85rem;padding:0.5rem 0;">本周暂无事件 🗓️</div>';
+                    return;
+                }
+                let html = '';
+                tasks.forEach((e, idx) => {
+                    const done = e.done || false;
+                    const priCls = e.priority === 'high' ? 'event-priority-high' : e.priority === 'medium' ?
+                        'event-priority-medium' : 'event-priority-low';
+                    const priText = e.priority === 'high' ? '紧急' : e.priority === 'medium' ? '重要' : '普通';
+                    html += `<div class="event-item" style="border-left-color:#7ab8d4;">
+                                <div class="event-check ${done?'done':''}" data-idx="${idx}" data-action="toggle-week"></div>
+                                <span class="event-text ${done?'done-text':''}">${e.name}</span>
+                                <span class="event-meta">
+                                    <span>📅 ${e.date}</span>
+                                    <span>${e.time||'--:--'}</span>
+                                    <span class="event-priority ${priCls}">${priText}</span>
+                                    <span class="event-type-badge">📋</span>
+                                    <span>🏷️ ${e.category||'未分类'}</span>
+                                </span>
+                                <div class="event-actions">
+                                    <button data-action="edit-week" data-idx="${idx}">✏️</button>
+                                    <button data-action="delete-week" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                eventsList.forEach((e, idx) => {
+                    const done = e.done || false;
+                    const priCls = e.priority === 'high' ? 'event-priority-high' : e.priority === 'medium' ?
+                        'event-priority-medium' : 'event-priority-low';
+                    const priText = e.priority === 'high' ? '紧急' : e.priority === 'medium' ? '重要' : '普通';
+                    const color = e.color || '#7ab8d4';
+                    html += `<div class="event-item" style="border-left-color:${color};">
+                                <div class="event-check ${done?'done':''}" data-idx="${idx}" data-action="toggle-week"></div>
+                                <span class="event-text ${done?'done-text':''}">${e.name}</span>
+                                <span class="event-meta">
+                                    <span>📅 ${e.startDate} ~ ${e.endDate}</span>
+                                    <span>${e.startTime||''} - ${e.endTime||''}</span>
+                                    <span class="event-priority ${priCls}">${priText}</span>
+                                    <span class="event-type-badge">📅</span>
+                                    <span>🏷️ ${e.category||'未分类'}</span>
+                                </span>
+                                <div class="event-actions">
+                                    <button data-action="edit-week" data-idx="${idx}">✏️</button>
+                                    <button data-action="delete-week" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                container.innerHTML = html;
+
+                const allWeekEvents = weekEvents;
+                container.querySelectorAll('[data-action="toggle-week"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        if (allWeekEvents[idx]) {
+                            const origIdx = events.indexOf(allWeekEvents[idx]);
+                            if (origIdx !== -1) { events[origIdx].done = !events[origIdx].done;
+                                save(EVENTS_KEY, events);
+                                renderEvents(); }
+                        }
+                    });
+                });
+                container.querySelectorAll('[data-action="edit-week"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = allWeekEvents[idx];
+                        if (!item) return;
+                        const origIdx = events.indexOf(item);
+                        if (origIdx === -1) return;
+                        openEditEventModal(origIdx, item);
+                    });
+                });
+                container.querySelectorAll('[data-action="delete-week"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = allWeekEvents[idx];
+                        if (!item) return;
+                        const origIdx = events.indexOf(item);
+                        if (origIdx === -1) return;
+                        if (confirm('确定删除？')) { events.splice(origIdx, 1);
+                            save(EVENTS_KEY, events);
+                            renderEvents(); }
+                    });
+                });
+            }
+
+            function renderWeekCalendar(weekEvents) {
+                const container = document.getElementById('eventWeekCalendar');
+                const range = getWeekRange(eventWeekView);
+                let html = `<div class="calendar-grid">`;
+                const weekdays = ['一', '二', '三', '四', '五', '六', '日'];
+                weekdays.forEach(d => html += `<div class="calendar-weekday">${d}</div>`);
+
+                const eventsInWeek = weekEvents.filter(e => e.type === 'event');
+                const dateMap = {};
+                for (let d = new Date(range.start); d <= range.end; d.setDate(d.getDate() + 1)) {
+                    const ds = formatDate(d);
+                    dateMap[ds] = [];
+                }
+                eventsInWeek.forEach(e => {
+                    const start = new Date(e.startDate);
+                    const end = new Date(e.endDate);
+                    for (let d = new Date(range.start); d <= range.end; d.setDate(d.getDate() + 1)) {
+                        if (d >= start && d <= end) {
+                            const ds = formatDate(d);
+                            if (dateMap[ds]) dateMap[ds].push(e);
+                        }
+                    }
+                });
+
+                for (let d = new Date(range.start); d <= range.end; d.setDate(d.getDate() + 1)) {
+                    const ds = formatDate(d);
+                    const isToday = sameDay(d, new Date());
+                    const eventsOnDay = dateMap[ds] || [];
+                    const bars = eventsOnDay.map(e => {
+                        const color = e.color || '#7ab8d4';
+                        return `<div class="day-bar" style="background:${color};"></div>`;
+                    }).join('');
+                    html += `<div class="calendar-day" style="${isToday?'background:rgba(180,210,230,0.3);':''}">
+                                <div class="day-num">${d.getDate()}</div>
+                                <div class="day-bars">${bars}</div>
+                            </div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            // ---- 当月 ----
+            function renderEventMonth() {
+                const year = eventMonthView.getFullYear();
+                const month = eventMonthView.getMonth();
+                const monthStr = `${year}-${String(month+1).padStart(2,'0')}`;
+                document.getElementById('eventMonthLabel').textContent = `${year}年${month+1}月`;
+
+                const monthEvents = getEventsBySub(eventSub).filter(e => {
+                    if (e.type === 'task') {
+                        return e.date && e.date.startsWith(monthStr);
+                    } else {
+                        const start = new Date(e.startDate);
+                        const end = new Date(e.endDate);
+                        const monthStart = new Date(year, month, 1);
+                        const monthEnd = new Date(year, month + 1, 0);
+                        return !(end < monthStart || start > monthEnd);
+                    }
+                });
+
+                renderMonthList(monthEvents);
+                renderMonthCalendar(monthEvents);
+            }
+
+            function renderMonthList(monthEvents) {
+                const container = document.getElementById('eventMonthList');
+                const tasks = monthEvents.filter(e => e.type === 'task');
+                const eventsList = monthEvents.filter(e => e.type === 'event');
+                if (!tasks.length && !eventsList.length) {
+                    container.innerHTML = '<div style="color:#a0b8c8;font-size:0.85rem;padding:0.5rem 0;">本月暂无事件 📊</div>';
+                    return;
+                }
+                let html = '';
+                tasks.forEach((e, idx) => {
+                    const done = e.done || false;
+                    const priCls = e.priority === 'high' ? 'event-priority-high' : e.priority === 'medium' ?
+                        'event-priority-medium' : 'event-priority-low';
+                    const priText = e.priority === 'high' ? '紧急' : e.priority === 'medium' ? '重要' : '普通';
+                    html += `<div class="event-item" style="border-left-color:#7ab8d4;">
+                                <div class="event-check ${done?'done':''}" data-idx="${idx}" data-action="toggle-month"></div>
+                                <span class="event-text ${done?'done-text':''}">${e.name}</span>
+                                <span class="event-meta">
+                                    <span>📅 ${e.date}</span>
+                                    <span>${e.time||'--:--'}</span>
+                                    <span class="event-priority ${priCls}">${priText}</span>
+                                    <span class="event-type-badge">📋</span>
+                                    <span>🏷️ ${e.category||'未分类'}</span>
+                                </span>
+                                <div class="event-actions">
+                                    <button data-action="edit-month" data-idx="${idx}">✏️</button>
+                                    <button data-action="delete-month" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                eventsList.forEach((e, idx) => {
+                    const done = e.done || false;
+                    const priCls = e.priority === 'high' ? 'event-priority-high' : e.priority === 'medium' ?
+                        'event-priority-medium' : 'event-priority-low';
+                    const priText = e.priority === 'high' ? '紧急' : e.priority === 'medium' ? '重要' : '普通';
+                    const color = e.color || '#7ab8d4';
+                    html += `<div class="event-item" style="border-left-color:${color};">
+                                <div class="event-check ${done?'done':''}" data-idx="${idx}" data-action="toggle-month"></div>
+                                <span class="event-text ${done?'done-text':''}">${e.name}</span>
+                                <span class="event-meta">
+                                    <span>📅 ${e.startDate} ~ ${e.endDate}</span>
+                                    <span>${e.startTime||''} - ${e.endTime||''}</span>
+                                    <span class="event-priority ${priCls}">${priText}</span>
+                                    <span class="event-type-badge">📅</span>
+                                    <span>🏷️ ${e.category||'未分类'}</span>
+                                </span>
+                                <div class="event-actions">
+                                    <button data-action="edit-month" data-idx="${idx}">✏️</button>
+                                    <button data-action="delete-month" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                container.innerHTML = html;
+
+                const allMonthEvents = monthEvents;
+                container.querySelectorAll('[data-action="toggle-month"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        if (allMonthEvents[idx]) {
+                            const origIdx = events.indexOf(allMonthEvents[idx]);
+                            if (origIdx !== -1) { events[origIdx].done = !events[origIdx].done;
+                                save(EVENTS_KEY, events);
+                                renderEvents(); }
+                        }
+                    });
+                });
+                container.querySelectorAll('[data-action="edit-month"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = allMonthEvents[idx];
+                        if (!item) return;
+                        const origIdx = events.indexOf(item);
+                        if (origIdx === -1) return;
+                        openEditEventModal(origIdx, item);
+                    });
+                });
+                container.querySelectorAll('[data-action="delete-month"]').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = allMonthEvents[idx];
+                        if (!item) return;
+                        const origIdx = events.indexOf(item);
+                        if (origIdx === -1) return;
+                        if (confirm('确定删除？')) { events.splice(origIdx, 1);
+                            save(EVENTS_KEY, events);
+                            renderEvents(); }
+                    });
+                });
+            }
+
+            function renderMonthCalendar(monthEvents) {
+                const container = document.getElementById('eventMonthCalendar');
+                const year = eventMonthView.getFullYear();
+                const month = eventMonthView.getMonth();
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+                let html = `<div class="calendar-grid">`;
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                weekdays.forEach(d => html += `<div class="calendar-weekday">${d}</div>`);
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<div class="calendar-day" style="background:transparent;border:none;"></div>`;
+                }
+
+                const eventsInMonth = monthEvents.filter(e => e.type === 'event');
+                const dateMap = {};
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    dateMap[ds] = [];
+                }
+                eventsInMonth.forEach(e => {
+                    const start = new Date(e.startDate);
+                    const end = new Date(e.endDate);
+                    for (let d = 1; d <= daysInMonth; d++) {
+                        const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                        const cur = new Date(year, month, d);
+                        if (cur >= start && cur <= end) {
+                            if (dateMap[ds]) dateMap[ds].push(e);
+                        }
+                    }
+                });
+
+                const today = new Date();
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const ds = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+                    const isToday = (year === today.getFullYear() && month === today.getMonth() && d === today.getDate());
+                    const eventsOnDay = dateMap[ds] || [];
+                    const bars = eventsOnDay.map(e => {
+                        const color = e.color || '#7ab8d4';
+                        return `<div class="day-bar" style="background:${color};"></div>`;
+                    }).join('');
+                    html += `<div class="calendar-day" style="${isToday?'background:rgba(180,210,230,0.3);':''}">
+                                <div class="day-num">${d}</div>
+                                <div class="day-bars">${bars}</div>
+                            </div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+            }
+
+            // ---- 编辑事件模态框 ----
+            function openEditEventModal(origIdx, item) {
+                let fields = [];
+                if (item.type === 'task') {
+                    fields = [
+                        { key: 'name', label: '名称', type: 'text', value: item.name },
+                        { key: 'date', label: '日期', type: 'date', value: item.date },
+                        { key: 'time', label: '时间', type: 'text', value: item.time || '' },
+                        { key: 'priority', label: '紧急性', type: 'select', value: item.priority || 'medium',
+                            options: [
+                                { value: 'high', text: '🔴 紧急' },
+                                { value: 'medium', text: '🟠 重要' },
+                                { value: 'low', text: '🟢 普通' }
+                            ] },
+                        { key: 'category', label: '类别', type: 'text', value: item.category || '' }
+                    ];
+                } else {
+                    fields = [
+                        { key: 'name', label: '名称', type: 'text', value: item.name },
+                        { key: 'startDate', label: '开始日期', type: 'date', value: item.startDate },
+                        { key: 'endDate', label: '结束日期', type: 'date', value: item.endDate },
+                        { key: 'startTime', label: '开始时间', type: 'text', value: item.startTime || '' },
+                        { key: 'endTime', label: '结束时间', type: 'text', value: item.endTime || '' },
+                        { key: 'color', label: '颜色', type: 'color', value: item.color || '#7ab8d4' },
+                        { key: 'priority', label: '紧急性', type: 'select', value: item.priority || 'medium',
+                            options: [
+                                { value: 'high', text: '🔴 紧急' },
+                                { value: 'medium', text: '🟠 重要' },
+                                { value: 'low', text: '🟢 普通' }
+                            ] },
+                        { key: 'category', label: '类别', type: 'text', value: item.category || '' }
+                    ];
+                }
+                openEditModal('event', origIdx, fields, '✏️ 编辑事件');
+            }
+
+            function updateEvent(id, updates) {
+                if (id >= 0 && id < events.length) {
+                    Object.assign(events[id], updates);
+                    save(EVENTS_KEY, events);
+                    return true;
+                }
+                return false;
+            }
+
+            // ---- 快速添加 ----
+            document.getElementById('addEventQuick').addEventListener('click', function() {
+                const name = document.getElementById('eventQuickName').value.trim();
+                const date = document.getElementById('eventQuickDate').value;
+                const time = document.getElementById('eventQuickTime').value || '';
+                const priority = document.getElementById('eventQuickPriority').value;
+                const category = document.getElementById('eventQuickCategory').value;
+                if (!name || !date) return;
+                const sub = category === '工作' ? 'work' : 'life';
+                events.push({ type: 'task', name, date, time, priority, category, sub, done: false });
+                save(EVENTS_KEY, events);
+                document.getElementById('eventQuickName').value = '';
+                document.getElementById('eventQuickTime').value = '';
+                renderEvents();
+            });
+
+            document.getElementById('addEventQuickEvent').addEventListener('click', function() {
+                const name = document.getElementById('eventQuickName').value.trim();
+                const start = document.getElementById('eventQuickStart').value;
+                const end = document.getElementById('eventQuickEnd').value;
+                const color = document.getElementById('eventQuickColor').value;
+                const priority = document.getElementById('eventQuickPriorityEvent').value;
+                const category = document.getElementById('eventQuickCategoryEvent').value;
+                if (!name || !start || !end) return;
+                const startDate = start.split('T')[0];
+                const startTime = start.split('T')[1] || '';
+                const endDate = end.split('T')[0];
+                const endTime = end.split('T')[1] || '';
+                const sub = category === '工作' ? 'work' : 'life';
+                events.push({ type: 'event', name, startDate, endDate, startTime, endTime, color, priority, category,
+                    sub, done: false });
+                save(EVENTS_KEY, events);
+                document.getElementById('eventQuickName').value = '';
+                document.getElementById('eventQuickStart').value = '';
+                document.getElementById('eventQuickEnd').value = '';
+                renderEvents();
+            });
+
+            // ---- 日期导航 ----
+            document.getElementById('eventDayPrev').addEventListener('click', function() { eventDayView.setDate(eventDayView
+                    .getDate() - 1);
+                renderEvents();
+                loadEventDaySummary(); });
+            document.getElementById('eventDayNext').addEventListener('click', function() { eventDayView.setDate(eventDayView
+                    .getDate() + 1);
+                renderEvents();
+                loadEventDaySummary(); });
+            document.getElementById('eventDayToday').addEventListener('click', function() { eventDayView = new Date();
+                renderEvents();
+                loadEventDaySummary(); });
+            document.getElementById('eventDayGo').addEventListener('click', function() {
+                const val = document.getElementById('eventDayPicker').value;
+                if (val) { eventDayView = new Date(val);
+                    renderEvents();
+                    loadEventDaySummary(); }
+            });
+
+            document.getElementById('eventWeekPrev').addEventListener('click', function() { eventWeekView.setDate(eventWeekView
+                    .getDate() - 7);
+                renderEvents(); });
+            document.getElementById('eventWeekNext').addEventListener('click', function() { eventWeekView.setDate(eventWeekView
+                    .getDate() + 7);
+                renderEvents(); });
+            document.getElementById('eventWeekToday').addEventListener('click', function() { eventWeekView = new Date();
+                renderEvents(); });
+
+            document.getElementById('eventMonthPrev').addEventListener('click', function() { eventMonthView.setMonth(
+                    eventMonthView.getMonth() - 1);
+                renderEvents(); });
+            document.getElementById('eventMonthNext').addEventListener('click', function() { eventMonthView.setMonth(
+                    eventMonthView.getMonth() + 1);
+                renderEvents(); });
+            document.getElementById('eventMonthToday').addEventListener('click', function() { eventMonthView = new Date();
+                renderEvents(); });
+
+            // ---- 视图切换 ----
+            function setupViewTabs(tabContainer, listId, calId) {
+                const tabs = tabContainer.querySelectorAll('.view-tab');
+                tabs.forEach(tab => {
+                    tab.addEventListener('click', function() {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        this.classList.add('active');
+                        const view = this.dataset.view;
+                        document.getElementById(listId).style.display = view === 'list' ? 'block' : 'none';
+                        document.getElementById(calId).style.display = view === 'calendar' ? 'block' : 'none';
+                    });
+                });
+            }
+            setupViewTabs(document.getElementById('dayViewTabs'), 'eventDayList', 'eventDayCalendar');
+            setupViewTabs(document.getElementById('weekViewTabs'), 'eventWeekList', 'eventWeekCalendar');
+            setupViewTabs(document.getElementById('monthViewTabs'), 'eventMonthList', 'eventMonthCalendar');
+
+            // ---- 当天总结 ----
+            function loadEventDaySummary() {
+                const dateStr = formatDate(eventDayView);
+                const key = `${EVENT_DAY_SUMMARY_KEY}_${dateStr}`;
+                const val = getData(key, '');
+                document.getElementById('eventDaySummaryInput').value = val;
+                document.getElementById('eventDaySummaryDisplay').textContent = val ? '📌 ' + val : '';
+            }
+
+            document.getElementById('saveEventDaySummary').addEventListener('click', function() {
+                const dateStr = formatDate(eventDayView);
+                const val = document.getElementById('eventDaySummaryInput').value.trim();
+                const key = `${EVENT_DAY_SUMMARY_KEY}_${dateStr}`;
+                save(key, val);
+                loadEventDaySummary();
+            });
+
+            // ---- 年度总结 ----
+            function loadEventYearSummary() {
+                const year = document.getElementById('eventYearInput').value.trim();
+                if (!year) return;
+                const key = `${EVENT_YEAR_SUMMARY_KEY}_${year}`;
+                const val = getData(key, '');
+                document.getElementById('eventYearSummaryInput').value = val;
+                document.getElementById('eventYearSummaryDisplay').textContent = val ? '📌 ' + val : '';
+            }
+
+            document.getElementById('loadYearSummary').addEventListener('click', loadEventYearSummary);
+            document.getElementById('saveEventYearSummary').addEventListener('click', function() {
+                const year = document.getElementById('eventYearInput').value.trim();
+                if (!year) return;
+                const val = document.getElementById('eventYearSummaryInput').value.trim();
+                const key = `${EVENT_YEAR_SUMMARY_KEY}_${year}`;
+                save(key, val);
+                loadEventYearSummary();
+            });
+
+            // 初始化默认日期
+            document.getElementById('eventQuickDate').valueAsDate = new Date();
+            document.getElementById('eventDayPicker').valueAsDate = new Date();
+            const now = new Date();
+            const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+            document.getElementById('eventQuickStart').value = localNow.toISOString().slice(0, 16);
+            const later = new Date(now.getTime() + 3600000);
+            const localLater = new Date(later.getTime() - later.getTimezoneOffset() * 60000);
+            document.getElementById('eventQuickEnd').value = localLater.toISOString().slice(0, 16);
+
+            renderEvents();
+            loadEventDaySummary();
+            loadEventYearSummary();
+
+            // =============================================================
+            //  2. 绘画模块（不变）
+            // =============================================================
+            const DRAW_DATA_KEY = 'draw_data';
+            let drawData = getData(DRAW_DATA_KEY, {});
+
+            function renderDrawCalendar() {
+                const container = document.getElementById('drawCalendarContainer');
+                const month = document.getElementById('drawMonth').value;
+                const category = document.getElementById('drawCategory').value;
+                if (!month) return;
+                const [year, mon] = month.split('-').map(Number);
+                const firstDay = new Date(year, mon - 1, 1).getDay();
+                const daysInMonth = new Date(year, mon, 0).getDate();
+                let html =
+                    `<div style="font-weight:600;margin-bottom:0.3rem;">${year}年${mon}月 (${category==='practice'?'练习':'接单'})</div>`;
+                html += `<div class="calendar-grid">`;
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                weekdays.forEach(d => html += `<div class="calendar-weekday">${d}</div>`);
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<div class="calendar-day" style="background:transparent;border:none;"></div>`;
+                }
+                const key = `${year}-${String(mon).padStart(2,'0')}`;
+                const monthData = drawData[key] || {};
+                const catData = monthData[category] || {};
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const images = catData[d] || [];
+                    let imgHtml = '';
+                    if (images.length) {
+                        imgHtml = `<div class="img-grid">`;
+                        images.forEach(url => { imgHtml += `<img src="${url}" alt="绘画" />`; });
+                        imgHtml += `</div>`;
+                    } else {
+                        imgHtml = `<div class="empty-img">📷</div>`;
+                    }
+                    html += `<div class="calendar-day" data-date="${year}-${String(mon).padStart(2,'0')}-${String(d).padStart(2,'0')}" data-cat="${category}">
+                                <div class="day-num">${d}</div>
+                                ${imgHtml}
+                                <div class="img-count">${images.length}/5</div>
+                            </div>`;
+                }
+                html += '</div>';
+                container.innerHTML = html;
+
+                container.querySelectorAll('.calendar-day[data-date]').forEach(day => {
+                    day.addEventListener('click', function() {
+                        const date = this.dataset.date;
+                        const cat = this.dataset.cat;
+                        if (!date) return;
+                        const [year, mon, dayNum] = date.split('-').map(Number);
+                        const key = `${year}-${String(mon).padStart(2,'0')}`;
+                        const currentImages = drawData[key]?.[cat]?.[dayNum] || [];
+                        if (currentImages.length >= 5) { alert('每天最多上传 5 张图片！'); return; }
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = function(e) {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            const reader = new FileReader();
+                            reader.onload = function(ev) {
+                                const dataUrl = ev.target.result;
+                                if (!drawData[key]) drawData[key] = {};
+                                if (!drawData[key][cat]) drawData[key][cat] = {};
+                                if (!drawData[key][cat][dayNum]) drawData[key][cat][dayNum] = [];
+                                drawData[key][cat][dayNum].push(dataUrl);
+                                save(DRAW_DATA_KEY, drawData);
+                                renderDrawCalendar();
+                            };
+                            reader.readAsDataURL(file);
+                        };
+                        input.click();
+                    });
+                });
+            }
+
+            document.getElementById('loadDrawCalendar').addEventListener('click', renderDrawCalendar);
+            document.getElementById('generateYearlyDraw').addEventListener('click', function() {
+                const container = document.getElementById('yearlyPreview');
+                const allImages = [];
+                for (const mk in drawData) {
+                    for (const cat in drawData[mk]) {
+                        for (const d in drawData[mk][cat]) {
+                            const imgs = drawData[mk][cat][d];
+                            if (Array.isArray(imgs)) imgs.forEach(url => allImages.push(url));
+                        }
+                    }
+                }
+                if (!allImages.length) { container.innerHTML = '<div style="color:#a0b8c8;">暂无绘画图片</div>'; return; }
+                let html = '';
+                allImages.forEach(url => {
+                    html +=
+                        `<img src="${url}" style="width:60px;height:60px;object-fit:cover;border-radius:8px;border:1px solid #ddd;" />`;
+                });
+                container.innerHTML = html;
+            });
+            document.getElementById('drawMonth').valueAsDate = new Date();
+            renderDrawCalendar();
+
+            // =============================================================
+            //  3. 追番（与之前完全一致）
+            // =============================================================
+            const ANIME_KEY = 'anime_list';
+            let animeList = getData(ANIME_KEY, []);
+            let animeFilterRegion = 'all';
+            let animeFilterStatus = 'all';
+
+            function renderAnimeTags() {
+                const regionBar = document.getElementById('animeRegionBar');
+                const regionCount = { '国产': 0, '海外': 0 };
+                animeList.forEach(a => { if (a.region) regionCount[a.region] = (regionCount[a.region] || 0) + 1; });
+                let rhtml =
+                    `<span class="etag ${animeFilterRegion==='all'?'active':''}" data-region="all">全部 <span class="num">${animeList.length}</span></span>`;
+                ['国产', '海外'].forEach(r => {
+                    rhtml +=
+                        `<span class="etag ${animeFilterRegion===r?'active':''}" data-region="${r}">${r} <span class="num">${regionCount[r]||0}</span></span>`;
+                });
+                regionBar.innerHTML = rhtml;
+                regionBar.querySelectorAll('.etag').forEach(el => {
+                    el.addEventListener('click', function() {
+                        animeFilterRegion = this.dataset.region;
+                        renderAnimeTags();
+                        renderAnime();
+                    });
+                });
+
+                const statusBar = document.getElementById('animeStatusBar');
+                const statuses = ['watching', 'completed', 'on-hold', 'planning', 'dropped'];
+                const statusLabels = {
+                    'watching': '📺 在看',
+                    'completed': '✅ 已看完',
+                    'on-hold': '⏸️ 搁置',
+                    'planning': '📅 想追',
+                    'dropped': '❌ 弃番'
+                };
+                let shtml =
+                    `<span class="etag ${animeFilterStatus==='all'?'active':''}" data-status="all">全部 <span class="num">${animeList.length}</span></span>`;
+                statuses.forEach(s => {
+                    const count = animeList.filter(a => a.status === s).length;
+                    shtml +=
+                        `<span class="etag ${animeFilterStatus===s?'active':''}" data-status="${s}">${statusLabels[s]} <span class="num">${count}</span></span>`;
+                });
+                statusBar.innerHTML = shtml;
+                statusBar.querySelectorAll('.etag').forEach(el => {
+                    el.addEventListener('click', function() {
+                        animeFilterStatus = this.dataset.status;
+                        renderAnimeTags();
+                        renderAnime();
+                    });
+                });
+            }
+
+            function renderAnime() {
+                const grid = document.getElementById('animeGrid');
+                let filtered = animeList;
+                if (animeFilterRegion !== 'all') filtered = filtered.filter(a => a.region === animeFilterRegion);
+                if (animeFilterStatus !== 'all') filtered = filtered.filter(a => a.status === animeFilterStatus);
+                if (!filtered.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#a0b8c8;">暂无匹配番剧</div>';
+                    return;
+                }
+                let html = '';
+                const statusLabels = {
+                    'watching': '📺 在看',
+                    'completed': '✅ 已看完',
+                    'on-hold': '⏸️ 搁置',
+                    'planning': '📅 想追',
+                    'dropped': '❌ 弃番'
+                };
+                filtered.forEach((item, idx) => {
+                    const epDisplay = item.totalEp ? `${item.currentEp} / ${item.totalEp}` : `${item.currentEp} 集`;
+                    const statusText = statusLabels[item.status] || item.status;
+                    const statusCls = statusClassMap[item.status] || '';
+                    html += `<div class="entry-card">
+                                <div class="card-top">
+                                    <div class="card-title">${item.name}</div>
+                                    <span class="card-status ${statusCls}">${statusText}</span>
+                                </div>
+                                <div class="card-meta">
+                                    <span>📺 ${epDisplay}</span>
+                                    <span>🌍 ${item.region||'国产'}</span>
+                                    <span>${item.comment?'💬 '+item.comment:''}</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-inc" data-act="inc" data-idx="${idx}">+1</button>
+                                    <button class="btn-dec" data-act="dec" data-idx="${idx}">-1</button>
+                                    <button class="btn-edit" data-act="edit" data-idx="${idx}">✏️</button>
+                                    <button class="btn-delete" data-act="delete" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                grid.innerHTML = html;
+
+                const filteredList = filtered;
+                grid.querySelectorAll('[data-act="inc"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (item) { const oi = animeList.indexOf(item); if (oi !== -1) { animeList[oi]
+                                    .currentEp = (animeList[oi].currentEp || 0) + 1;
+                                save(ANIME_KEY, animeList);
+                                renderAnime();
+                                renderAnimeTags(); } }
+                    });
+                });
+                grid.querySelectorAll('[data-act="dec"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (item) { const oi = animeList.indexOf(item); if (oi !== -1) { animeList[oi]
+                                    .currentEp = Math.max(0, (animeList[oi].currentEp || 0) - 1);
+                                save(ANIME_KEY, animeList);
+                                renderAnime();
+                                renderAnimeTags(); } }
+                    });
+                });
+                grid.querySelectorAll('[data-act="edit"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        const oi = animeList.indexOf(item);
+                        if (oi === -1) return;
+                        openEditModal('anime', oi, [
+                            { key: 'name', label: '名称', type: 'text', value: item.name },
+                            { key: 'currentEp', label: '当前集数', type: 'number', value: item.currentEp },
+                            { key: 'totalEp', label: '总集数', type: 'number', value: item.totalEp },
+                            { key: 'status', label: '状态', type: 'select', value: item.status,
+                                options: [
+                                    { value: 'watching', text: '📺 在看' },
+                                    { value: 'completed', text: '✅ 已看完' },
+                                    { value: 'on-hold', text: '⏸️ 搁置' },
+                                    { value: 'planning', text: '📅 想追' },
+                                    { value: 'dropped', text: '❌ 弃番' }
+                                ] },
+                            { key: 'region', label: '地区', type: 'select', value: item.region ||
+                                    '国产', options: [
+                                    { value: '国产', text: '🇨🇳 国产' },
+                                    { value: '海外', text: '🌍 海外' }
+                                ] },
+                            { key: 'comment', label: '评价', type: 'textarea', value: item.comment ||
+                                    '' }
+                        ], '编辑番剧');
+                    });
+                });
+                grid.querySelectorAll('[data-act="delete"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        if (confirm('确定删除？')) { const oi = animeList.indexOf(item); if (oi !== -1) { animeList
+                                    .splice(oi, 1);
+                                save(ANIME_KEY, animeList);
+                                renderAnime();
+                                renderAnimeTags(); } }
+                    });
+                });
+            }
+
+            function updateAnime(id, updates) {
+                if (id >= 0 && id < animeList.length) { Object.assign(animeList[id], updates);
+                    save(ANIME_KEY, animeList); return true; }
+                return false;
+            }
+
+            document.getElementById('addAnime').addEventListener('click', function() {
+                const name = document.getElementById('animeName').value.trim();
+                const epStr = document.getElementById('animeEp').value.trim();
+                const status = document.getElementById('animeStatus').value;
+                const region = document.getElementById('animeRegion').value;
+                if (!name) return;
+                const parts = epStr.split('/').map(s => parseInt(s.trim()));
+                const current = parts[0] || 0;
+                const total = parts[1] || 0;
+                animeList.push({ name, currentEp: current, totalEp: total, status, region, comment: '' });
+                save(ANIME_KEY, animeList);
+                document.getElementById('animeName').value = '';
+                document.getElementById('animeEp').value = '';
+                renderAnime();
+                renderAnimeTags();
+            });
+
+            renderAnime();
+            renderAnimeTags();
+
+            // =============================================================
+            //  4. 追剧（与之前完全一致）
+            // =============================================================
+            const DRAMA_KEY = 'drama_list';
+            let dramaList = getData(DRAMA_KEY, []);
+            let dramaFilterRegion = 'all';
+            let dramaFilterStatus = 'all';
+            dramaList = dramaList.map(item => { if (!item.region) item.region = '国产'; return item; });
+            save(DRAMA_KEY, dramaList);
+
+            function renderDramaTags() {
+                const regionBar = document.getElementById('dramaRegionBar');
+                const regionCount = { '国产': 0, '海外': 0 };
+                dramaList.forEach(a => { if (a.region) regionCount[a.region] = (regionCount[a.region] || 0) + 1; });
+                let rhtml =
+                    `<span class="etag ${dramaFilterRegion==='all'?'active':''}" data-region="all">全部 <span class="num">${dramaList.length}</span></span>`;
+                ['国产', '海外'].forEach(r => {
+                    rhtml +=
+                        `<span class="etag ${dramaFilterRegion===r?'active':''}" data-region="${r}">${r} <span class="num">${regionCount[r]||0}</span></span>`;
+                });
+                regionBar.innerHTML = rhtml;
+                regionBar.querySelectorAll('.etag').forEach(el => {
+                    el.addEventListener('click', function() {
+                        dramaFilterRegion = this.dataset.region;
+                        renderDramaTags();
+                        renderDrama();
+                    });
+                });
+
+                const statusBar = document.getElementById('dramaStatusBar');
+                const statuses = ['watching', 'completed', 'on-hold', 'planning', 'dropped'];
+                const statusLabels = {
+                    'watching': '📺 在看',
+                    'completed': '✅ 已看完',
+                    'on-hold': '⏸️ 搁置',
+                    'planning': '📅 想追',
+                    'dropped': '❌ 弃剧'
+                };
+                let shtml =
+                    `<span class="etag ${dramaFilterStatus==='all'?'active':''}" data-status="all">全部 <span class="num">${dramaList.length}</span></span>`;
+                statuses.forEach(s => {
+                    const count = dramaList.filter(a => a.status === s).length;
+                    shtml +=
+                        `<span class="etag ${dramaFilterStatus===s?'active':''}" data-status="${s}">${statusLabels[s]} <span class="num">${count}</span></span>`;
+                });
+                statusBar.innerHTML = shtml;
+                statusBar.querySelectorAll('.etag').forEach(el => {
+                    el.addEventListener('click', function() {
+                        dramaFilterStatus = this.dataset.status;
+                        renderDramaTags();
+                        renderDrama();
+                    });
+                });
+            }
+
+            function renderDrama() {
+                const grid = document.getElementById('dramaGrid');
+                let filtered = dramaList;
+                if (dramaFilterRegion !== 'all') filtered = filtered.filter(a => a.region === dramaFilterRegion);
+                if (dramaFilterStatus !== 'all') filtered = filtered.filter(a => a.status === dramaFilterStatus);
+                if (!filtered.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#a0b8c8;">暂无匹配剧集</div>';
+                    return;
+                }
+                let html = '';
+                const statusLabels = {
+                    'watching': '📺 在看',
+                    'completed': '✅ 已看完',
+                    'on-hold': '⏸️ 搁置',
+                    'planning': '📅 想追',
+                    'dropped': '❌ 弃剧'
+                };
+                filtered.forEach((item, idx) => {
+                    const epDisplay = item.totalEp ? `${item.currentEp} / ${item.totalEp}` : `${item.currentEp} 集`;
+                    const statusText = statusLabels[item.status] || item.status;
+                    const statusCls = statusClassMap[item.status] || '';
+                    html += `<div class="entry-card">
+                                <div class="card-top">
+                                    <div class="card-title">${item.name}</div>
+                                    <span class="card-status ${statusCls}">${statusText}</span>
+                                </div>
+                                <div class="card-meta">
+                                    <span>🎬 ${epDisplay}</span>
+                                    <span>🌍 ${item.region||'国产'}</span>
+                                    <span>${item.comment?'💬 '+item.comment:''}</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-inc" data-act="inc" data-idx="${idx}">+1</button>
+                                    <button class="btn-dec" data-act="dec" data-idx="${idx}">-1</button>
+                                    <button class="btn-edit" data-act="edit" data-idx="${idx}">✏️</button>
+                                    <button class="btn-delete" data-act="delete" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                grid.innerHTML = html;
+
+                const filteredList = filtered;
+                grid.querySelectorAll('[data-act="inc"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (item) { const oi = dramaList.indexOf(item); if (oi !== -1) { dramaList[oi]
+                                    .currentEp = (dramaList[oi].currentEp || 0) + 1;
+                                save(DRAMA_KEY, dramaList);
+                                renderDrama();
+                                renderDramaTags(); } }
+                    });
+                });
+                grid.querySelectorAll('[data-act="dec"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (item) { const oi = dramaList.indexOf(item); if (oi !== -1) { dramaList[oi]
+                                    .currentEp = Math.max(0, (dramaList[oi].currentEp || 0) - 1);
+                                save(DRAMA_KEY, dramaList);
+                                renderDrama();
+                                renderDramaTags(); } }
+                    });
+                });
+                grid.querySelectorAll('[data-act="edit"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        const oi = dramaList.indexOf(item);
+                        if (oi === -1) return;
+                        openEditModal('drama', oi, [
+                            { key: 'name', label: '名称', type: 'text', value: item.name },
+                            { key: 'currentEp', label: '当前集数', type: 'number', value: item.currentEp },
+                            { key: 'totalEp', label: '总集数', type: 'number', value: item.totalEp },
+                            { key: 'status', label: '状态', type: 'select', value: item.status,
+                                options: [
+                                    { value: 'watching', text: '📺 在看' },
+                                    { value: 'completed', text: '✅ 已看完' },
+                                    { value: 'on-hold', text: '⏸️ 搁置' },
+                                    { value: 'planning', text: '📅 想追' },
+                                    { value: 'dropped', text: '❌ 弃剧' }
+                                ] },
+                            { key: 'region', label: '地区', type: 'select', value: item.region ||
+                                    '国产', options: [
+                                    { value: '国产', text: '🇨🇳 国产' },
+                                    { value: '海外', text: '🌍 海外' }
+                                ] },
+                            { key: 'comment', label: '评价', type: 'textarea', value: item.comment ||
+                                    '' }
+                        ], '编辑剧集');
+                    });
+                });
+                grid.querySelectorAll('[data-act="delete"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        if (confirm('确定删除？')) { const oi = dramaList.indexOf(item); if (oi !== -1) { dramaList
+                                    .splice(oi, 1);
+                                save(DRAMA_KEY, dramaList);
+                                renderDrama();
+                                renderDramaTags(); } }
+                    });
+                });
+            }
+
+            function updateDrama(id, updates) {
+                if (id >= 0 && id < dramaList.length) { Object.assign(dramaList[id], updates);
+                    save(DRAMA_KEY, dramaList); return true; }
+                return false;
+            }
+
+            document.getElementById('addDrama').addEventListener('click', function() {
+                const name = document.getElementById('dramaName').value.trim();
+                const epStr = document.getElementById('dramaEp').value.trim();
+                const status = document.getElementById('dramaStatus').value;
+                const region = document.getElementById('dramaRegion').value;
+                if (!name) return;
+                const parts = epStr.split('/').map(s => parseInt(s.trim()));
+                const current = parts[0] || 0;
+                const total = parts[1] || 0;
+                dramaList.push({ name, currentEp: current, totalEp: total, status, region, comment: '' });
+                save(DRAMA_KEY, dramaList);
+                document.getElementById('dramaName').value = '';
+                document.getElementById('dramaEp').value = '';
+                renderDrama();
+                renderDramaTags();
+            });
+
+            renderDrama();
+            renderDramaTags();
+
+            // =============================================================
+            //  5. 小说（与之前完全一致）
+            // =============================================================
+            const NOVEL_KEY = 'novel_list';
+            let novelList = getData(NOVEL_KEY, []);
+            let novelFilterStatus = 'all';
+
+            function renderNovelStatusBar() {
+                const bar = document.getElementById('novelStatusBar');
+                const statuses = ['reading', 'completed', 'on-hold', 'planning', 'dropped'];
+                const statusLabels = {
+                    'reading': '📖 在读',
+                    'completed': '✅ 已读完',
+                    'on-hold': '⏸️ 搁置',
+                    'planning': '📅 想读',
+                    'dropped': '❌ 弃书'
+                };
+                let html =
+                    `<span class="etag ${novelFilterStatus==='all'?'active':''}" data-status="all">全部 <span class="num">${novelList.length}</span></span>`;
+                statuses.forEach(s => {
+                    const count = novelList.filter(a => a.status === s).length;
+                    html +=
+                        `<span class="etag ${novelFilterStatus===s?'active':''}" data-status="${s}">${statusLabels[s]} <span class="num">${count}</span></span>`;
+                });
+                bar.innerHTML = html;
+                bar.querySelectorAll('.etag').forEach(el => {
+                    el.addEventListener('click', function() {
+                        novelFilterStatus = this.dataset.status;
+                        renderNovelStatusBar();
+                        renderNovel();
+                    });
+                });
+            }
+
+            function renderNovel() {
+                const grid = document.getElementById('novelGrid');
+                let filtered = novelList;
+                if (novelFilterStatus !== 'all') filtered = filtered.filter(a => a.status === novelFilterStatus);
+                if (!filtered.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#a0b8c8;">暂无匹配小说</div>';
+                    return;
+                }
+                let html = '';
+                const statusLabels = {
+                    'reading': '📖 在读',
+                    'completed': '✅ 已读完',
+                    'on-hold': '⏸️ 搁置',
+                    'planning': '📅 想读',
+                    'dropped': '❌ 弃书'
+                };
+                filtered.forEach((item, idx) => {
+                    const epDisplay = item.totalCh ? `${item.currentCh} / ${item.totalCh}` : `${item.currentCh} 章`;
+                    const statusText = statusLabels[item.status] || item.status;
+                    const statusCls = statusClassMap[item.status] || '';
+                    html += `<div class="entry-card">
+                                <div class="card-top">
+                                    <div class="card-title">${item.name}</div>
+                                    <span class="card-status ${statusCls}">${statusText}</span>
+                                </div>
+                                <div class="card-meta">
+                                    <span>📖 ${epDisplay}</span>
+                                    <span>${item.comment?'💬 '+item.comment:''}</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-inc" data-act="inc" data-idx="${idx}">+1</button>
+                                    <button class="btn-dec" data-act="dec" data-idx="${idx}">-1</button>
+                                    <button class="btn-edit" data-act="edit" data-idx="${idx}">✏️</button>
+                                    <button class="btn-delete" data-act="delete" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                grid.innerHTML = html;
+
+                const filteredList = filtered;
+                grid.querySelectorAll('[data-act="inc"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (item) { const oi = novelList.indexOf(item); if (oi !== -1) { novelList[oi]
+                                    .currentCh = (novelList[oi].currentCh || 0) + 1;
+                                save(NOVEL_KEY, novelList);
+                                renderNovel();
+                                renderNovelStatusBar(); } }
+                    });
+                });
+                grid.querySelectorAll('[data-act="dec"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (item) { const oi = novelList.indexOf(item); if (oi !== -1) { novelList[oi]
+                                    .currentCh = Math.max(0, (novelList[oi].currentCh || 0) - 1);
+                                save(NOVEL_KEY, novelList);
+                                renderNovel();
+                                renderNovelStatusBar(); } }
+                    });
+                });
+                grid.querySelectorAll('[data-act="edit"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        const oi = novelList.indexOf(item);
+                        if (oi === -1) return;
+                        openEditModal('novel', oi, [
+                            { key: 'name', label: '名称', type: 'text', value: item.name },
+                            { key: 'currentCh', label: '当前章节', type: 'number', value: item.currentCh },
+                            { key: 'totalCh', label: '总章节', type: 'number', value: item.totalCh },
+                            { key: 'status', label: '状态', type: 'select', value: item.status,
+                                options: [
+                                    { value: 'reading', text: '📖 在读' },
+                                    { value: 'completed', text: '✅ 已读完' },
+                                    { value: 'on-hold', text: '⏸️ 搁置' },
+                                    { value: 'planning', text: '📅 想读' },
+                                    { value: 'dropped', text: '❌ 弃书' }
+                                ] },
+                            { key: 'comment', label: '评价', type: 'textarea', value: item.comment ||
+                                    '' }
+                        ], '编辑小说');
+                    });
+                });
+                grid.querySelectorAll('[data-act="delete"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        if (confirm('确定删除？')) { const oi = novelList.indexOf(item); if (oi !== -1) { novelList
+                                    .splice(oi, 1);
+                                save(NOVEL_KEY, novelList);
+                                renderNovel();
+                                renderNovelStatusBar(); } }
+                    });
+                });
+            }
+
+            function updateNovel(id, updates) {
+                if (id >= 0 && id < novelList.length) { Object.assign(novelList[id], updates);
+                    save(NOVEL_KEY, novelList); return true; }
+                return false;
+            }
+
+            document.getElementById('addNovel').addEventListener('click', function() {
+                const name = document.getElementById('novelName').value.trim();
+                const chStr = document.getElementById('novelChapter').value.trim();
+                const status = document.getElementById('novelStatus').value;
+                if (!name) return;
+                const parts = chStr.split('/').map(s => parseInt(s.trim()));
+                const current = parts[0] || 0;
+                const total = parts[1] || 0;
+                novelList.push({ name, currentCh: current, totalCh: total, status, comment: '' });
+                save(NOVEL_KEY, novelList);
+                document.getElementById('novelName').value = '';
+                document.getElementById('novelChapter').value = '';
+                renderNovel();
+                renderNovelStatusBar();
+            });
+
+            renderNovel();
+            renderNovelStatusBar();
+
+            // =============================================================
+            //  6. 物品（与之前完全一致）
+            // =============================================================
+            const ITEMS_KEY = 'items_list';
+            const ITEM_CATS_KEY = 'item_categories';
+            let itemsList = getData(ITEMS_KEY, []);
+            let itemCategories = getData(ITEM_CATS_KEY, ['服饰', '电子产品', '清洁产品', '日常消耗品', '小物件']);
+            let itemFilterCategory = 'all';
+
+            function renderItemCatTags() {
+                const container = document.getElementById('itemCatTags');
+                const select = document.getElementById('itemCategorySelect');
+                let html =
+                    `<span class="cat-tag ${itemFilterCategory==='all'?'active':''}" data-cat="all">全部</span>`;
+                itemCategories.forEach(cat => {
+                    html +=
+                        `<span class="cat-tag ${itemFilterCategory===cat?'active':''}" data-cat="${cat}">${cat} <span class="cat-del" data-cat="${cat}">✕</span></span>`;
+                });
+                container.innerHTML = html;
+                select.innerHTML = itemCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+                container.querySelectorAll('.cat-tag').forEach(el => {
+                    el.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('cat-del')) return;
+                        const cat = this.dataset.cat;
+                        itemFilterCategory = cat;
+                        renderItemCatTags();
+                        renderItems();
+                    });
+                });
+                container.querySelectorAll('.cat-del').forEach(el => {
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const cat = this.dataset.cat;
+                        if (confirm(`确定删除分类 "${cat}" ？`)) {
+                            itemCategories = itemCategories.filter(c => c !== cat);
+                            save(ITEM_CATS_KEY, itemCategories);
+                            if (itemFilterCategory === cat) itemFilterCategory = 'all';
+                            renderItemCatTags();
+                            renderItems();
+                        }
+                    });
+                });
+            }
+
+            document.getElementById('addItemCat').addEventListener('click', function() {
+                const val = document.getElementById('itemNewCat').value.trim();
+                if (!val) return;
+                if (itemCategories.includes(val)) { alert('分类已存在'); return; }
+                itemCategories.push(val);
+                save(ITEM_CATS_KEY, itemCategories);
+                document.getElementById('itemNewCat').value = '';
+                renderItemCatTags();
+            });
+
+            function renderItems() {
+                const grid = document.getElementById('itemGrid');
+                let filtered = itemsList;
+                if (itemFilterCategory !== 'all') filtered = filtered.filter(i => i.category === itemFilterCategory);
+                if (!filtered.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#a0b8c8;">暂无匹配物品</div>';
+                } else {
+                    let html = '';
+                    filtered.forEach((item, idx) => {
+                        const statusText = item.status === 'using' ? '使用中' : item.status === 'used' ?
+                            '已用完' : '已丢弃';
+                        const statusCls = statusClassMap[item.status] || '';
+                        html += `<div class="entry-card">
+                                    <div class="card-top">
+                                        <div class="card-title">${item.name}</div>
+                                        <span class="card-status ${statusCls}">${statusText}</span>
+                                    </div>
+                                    <div class="card-meta">
+                                        <span>💰 ¥${item.price||0}</span>
+                                        <span>📅 ${item.days||0} 天</span>
+                                        <span>🏷️ ${item.category}</span>
+                                    </div>
+                                    <div class="card-actions">
+                                        <button class="btn-edit" data-act="edit" data-idx="${idx}">✏️</button>
+                                        <button class="btn-delete" data-act="delete" data-idx="${idx}">🗑️</button>
+                                    </div>
+                                </div>`;
+                    });
+                    grid.innerHTML = html;
+                    grid.querySelectorAll('[data-act="edit"]').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const idx = this.dataset.idx;
+                            const item = filtered[idx];
+                            if (!item) return;
+                            const oi = itemsList.indexOf(item);
+                            if (oi === -1) return;
+                            openEditModal('item', oi, [
+                                { key: 'name', label: '名称', type: 'text', value: item.name },
+                                { key: 'price', label: '价格', type: 'number', value: item.price,
+                                    step: '0.01' },
+                                { key: 'days', label: '使用天数', type: 'number', value: item.days },
+                                { key: 'category', label: '分类', type: 'select', value: item
+                                        .category || '服饰', options: itemCategories.map(c => ({ value: c,
+                                        text: c })) },
+                                { key: 'status', label: '状态', type: 'select', value: item.status,
+                                    options: [
+                                        { value: 'using', text: '使用中' },
+                                        { value: 'used', text: '已用完' },
+                                        { value: 'discarded', text: '已丢弃' }
+                                    ] }
+                            ], '编辑物品');
+                        });
+                    });
+                    grid.querySelectorAll('[data-act="delete"]').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const idx = this.dataset.idx;
+                            const item = filtered[idx];
+                            if (!item) return;
+                            const oi = itemsList.indexOf(item);
+                            if (oi === -1) return;
+                            if (confirm('确定删除？')) { itemsList.splice(oi, 1);
+                                save(ITEMS_KEY, itemsList);
+                                renderItems();
+                                updateItemSummary(); }
+                        });
+                    });
+                }
+                updateItemSummary();
+            }
+
+            function updateItem(id, updates) {
+                if (id >= 0 && id < itemsList.length) { Object.assign(itemsList[id], updates);
+                    save(ITEMS_KEY, itemsList); return true; }
+                return false;
+            }
+
+            function updateItemSummary() {
+                const summary = document.getElementById('itemSummary');
+                let totalAll = 0;
+                let parts = [];
+                itemCategories.forEach(cat => {
+                    const total = itemsList.filter(i => i.category === cat).reduce((s, i) => s + (i.price || 0),
+                    0);
+                    if (total > 0) parts.push(`${cat}: ¥${total.toFixed(2)}`);
+                    totalAll += total;
+                });
+                summary.innerHTML =
+                    `<span>📊 分类汇总：${parts.length?parts.join(' | '):'无数据'}</span><span>💰 总价值：¥${totalAll.toFixed(2)}</span>`;
+            }
+
+            document.getElementById('addItem').addEventListener('click', function() {
+                const name = document.getElementById('itemName').value.trim();
+                const price = parseFloat(document.getElementById('itemPrice').value) || 0;
+                const days = parseInt(document.getElementById('itemDays').value) || 0;
+                const category = document.getElementById('itemCategorySelect').value;
+                const status = document.getElementById('itemStatus').value;
+                if (!name) return;
+                itemsList.push({ name, price, days, category, status });
+                save(ITEMS_KEY, itemsList);
+                document.getElementById('itemName').value = '';
+                document.getElementById('itemPrice').value = '';
+                document.getElementById('itemDays').value = '';
+                renderItems();
+            });
+
+            renderItemCatTags();
+            renderItems();
+
+            // =============================================================
+            //  7. 记账（与之前完全一致）
+            // =============================================================
+            const LEDGER_KEY = 'ledger_list';
+            const LEDGER_CATS_KEY = 'ledger_categories';
+            let ledgerList = getData(LEDGER_KEY, []);
+            let ledgerCategories = getData(LEDGER_CATS_KEY, ['食物', '服饰', '学习', '消耗品', '化妆', '电子产品', '其他']);
+            let ledgerSummaryType = 'day';
+            let ledgerDayView = new Date();
+            let ledgerFilterCategory = 'all';
+
+            function renderLedgerCatTags() {
+                const container = document.getElementById('ledgerCatTags');
+                const select = document.getElementById('ledgerCategorySelect');
+                let html =
+                    `<span class="cat-tag ${ledgerFilterCategory==='all'?'active':''}" data-cat="all">全部</span>`;
+                ledgerCategories.forEach(cat => {
+                    html +=
+                        `<span class="cat-tag ${ledgerFilterCategory===cat?'active':''}" data-cat="${cat}">${cat} <span class="cat-del" data-cat="${cat}">✕</span></span>`;
+                });
+                container.innerHTML = html;
+                select.innerHTML = ledgerCategories.map(c => `<option value="${c}">${c}</option>`).join('');
+
+                container.querySelectorAll('.cat-tag').forEach(el => {
+                    el.addEventListener('click', function(e) {
+                        if (e.target.classList.contains('cat-del')) return;
+                        const cat = this.dataset.cat;
+                        ledgerFilterCategory = cat;
+                        renderLedgerCatTags();
+                        updateLedgerSummary(ledgerSummaryType);
+                    });
+                });
+                container.querySelectorAll('.cat-del').forEach(el => {
+                    el.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const cat = this.dataset.cat;
+                        if (confirm(`确定删除分类 "${cat}" ？`)) {
+                            ledgerCategories = ledgerCategories.filter(c => c !== cat);
+                            save(LEDGER_CATS_KEY, ledgerCategories);
+                            if (ledgerFilterCategory === cat) ledgerFilterCategory = 'all';
+                            renderLedgerCatTags();
+                            updateLedgerSummary(ledgerSummaryType);
+                        }
+                    });
+                });
+            }
+
+            document.getElementById('addLedgerCat').addEventListener('click', function() {
+                const val = document.getElementById('ledgerNewCat').value.trim();
+                if (!val) return;
+                if (ledgerCategories.includes(val)) { alert('分类已存在'); return; }
+                ledgerCategories.push(val);
+                save(LEDGER_CATS_KEY, ledgerCategories);
+                document.getElementById('ledgerNewCat').value = '';
+                renderLedgerCatTags();
+            });
+
+            function renderLedger() {
+                const grid = document.getElementById('ledgerGrid');
+                if (ledgerSummaryType !== 'day') {
+                    grid.innerHTML = '';
+                    grid.style.display = 'none';
+                    return;
+                }
+                grid.style.display = 'grid';
+                let filtered = ledgerList;
+                if (ledgerFilterCategory !== 'all') filtered = filtered.filter(i => i.category === ledgerFilterCategory);
+                const dateStr = formatDate(ledgerDayView);
+                filtered = filtered.filter(i => i.date === dateStr);
+                if (!filtered.length) {
+                    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#a0b8c8;">当天无记录</div>';
+                    return;
+                }
+                let html = '';
+                filtered.forEach((item, idx) => {
+                    const typeText = item.type === 'income' ? '📈 进账' : '📉 支出';
+                    const sign = item.type === 'income' ? '+' : '-';
+                    const color = item.type === 'income' ? '#1a6a3a' : '#8a2a2a';
+                    html += `<div class="entry-card">
+                                <div class="card-top">
+                                    <div class="card-title">${item.name}</div>
+                                    <span style="font-weight:700;color:${color};font-size:0.85rem;">${sign} ¥${item.amount.toFixed(2)}</span>
+                                </div>
+                                <div class="card-meta">
+                                    <span>${typeText}</span>
+                                    <span>🏷️ ${item.category||'其他'}</span>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn-edit" data-act="edit" data-idx="${idx}">✏️</button>
+                                    <button class="btn-delete" data-act="delete" data-idx="${idx}">🗑️</button>
+                                </div>
+                            </div>`;
+                });
+                grid.innerHTML = html;
+                const filteredList = filtered;
+                grid.querySelectorAll('[data-act="edit"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        const oi = ledgerList.indexOf(item);
+                        if (oi === -1) return;
+                        openEditModal('ledger', oi, [
+                            { key: 'name', label: '名称', type: 'text', value: item.name },
+                            { key: 'amount', label: '金额', type: 'number', value: item.amount,
+                                step: '0.01' },
+                            { key: 'type', label: '类型', type: 'select', value: item.type,
+                                options: [
+                                    { value: 'income', text: '📈 进账' },
+                                    { value: 'expense', text: '📉 支出' }
+                                ] },
+                            { key: 'category', label: '分类', type: 'select', value: item.category ||
+                                    '其他', options: ledgerCategories.map(c => ({ value: c, text: c })) },
+                            { key: 'date', label: '日期', type: 'date', value: item.date }
+                        ], '编辑记账');
+                    });
+                });
+                grid.querySelectorAll('[data-act="delete"]').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const item = filteredList[idx];
+                        if (!item) return;
+                        const oi = ledgerList.indexOf(item);
+                        if (oi === -1) return;
+                        if (confirm('确定删除？')) { ledgerList.splice(oi, 1);
+                            save(LEDGER_KEY, ledgerList);
+                            updateLedgerSummary(ledgerSummaryType); }
+                    });
+                });
+            }
+
+            function updateLedger(id, updates) {
+                if (id >= 0 && id < ledgerList.length) { Object.assign(ledgerList[id], updates);
+                    save(LEDGER_KEY, ledgerList); return true; }
+                return false;
+            }
+
+            function drawPie(canvasId, data, colors) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const rect = canvas.parentElement.getBoundingClientRect();
+                const size = Math.min(rect.width || 180, 180);
+                canvas.width = size;
+                canvas.height = size;
+                const cx = size / 2,
+                    cy = size / 2,
+                    r = size / 2 - 8;
+                const total = data.reduce((s, v) => s + v, 0);
+                if (total === 0) {
+                    ctx.fillStyle = '#eee';
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.fillStyle = '#a0b8c8';
+                    ctx.font = '12px sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('无数据', cx, cy);
+                    return;
+                }
+                let start = -Math.PI / 2;
+                data.forEach((val, i) => {
+                    const angle = (val / total) * 2 * Math.PI;
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, r, start, start + angle);
+                    ctx.closePath();
+                    ctx.fillStyle = colors[i % colors.length];
+                    ctx.fill();
+                    start += angle;
+                });
+                const legendContainer = document.getElementById(`legend_${canvasId}`);
+                if (legendContainer) {
+                    const labels = document.getElementById(`labels_${canvasId}`)?.value?.split(',') || [];
+                    let lhtml = '';
+                    labels.forEach((label, i) => {
+                        const val = data[i] || 0;
+                        if (val > 0) {
+                            lhtml +=
+                                `<div class="legend-item"><span class="legend-color" style="background:${colors[i%colors.length]}"></span> ${label} (¥${val.toFixed(1)})</div>`;
+                        }
+                    });
+                    legendContainer.innerHTML = lhtml || '<div style="color:#a0b8c8;">无数据</div>';
+                }
+            }
+
+            function updateLedgerSummary(type) {
+                ledgerSummaryType = type;
+                const container = document.getElementById('ledgerSummaryContent');
+                const now = new Date();
+                let startDate, endDate;
+                let label = '';
+
+                if (type === 'day') {
+                    const d = ledgerDayView;
+                    startDate = new Date(d);
+                    startDate.setHours(0, 0, 0, 0);
+                    endDate = new Date(d);
+                    endDate.setHours(23, 59, 59, 999);
+                    label = formatDateCN(d);
+                    const pickerHtml =
+                        `<div class="date-nav" style="margin-bottom:0.5rem;">
+                            <button id="ledgerDayPrev">◀</button>
+                            <span class="date-label">${label}</span>
+                            <button id="ledgerDayNext">▶</button>
+                            <button class="btn-sm btn-outline" id="ledgerDayToday">今天</button>
+                            <input type="date" id="ledgerDayPicker" style="flex:0 0 auto;width:auto;padding:0.2rem 0.5rem;border-radius:24px;border:1px solid rgba(180,210,230,0.3);font-size:0.75rem;" />
+                            <button class="btn-sm btn-outline" id="ledgerDayGo">跳转</button>
+                        </div>`;
+                    container.innerHTML = pickerHtml + `<div id="ledgerDayContent"></div><div id="ledgerDayGrid"></div>`;
+                    document.getElementById('ledgerDayPrev').addEventListener('click', function() {
+                        ledgerDayView.setDate(ledgerDayView.getDate() - 1);
+                        updateLedgerSummary('day');
+                    });
+                    document.getElementById('ledgerDayNext').addEventListener('click', function() {
+                        ledgerDayView.setDate(ledgerDayView.getDate() + 1);
+                        updateLedgerSummary('day');
+                    });
+                    document.getElementById('ledgerDayToday').addEventListener('click', function() {
+                        ledgerDayView = new Date();
+                        updateLedgerSummary('day');
+                    });
+                    document.getElementById('ledgerDayGo').addEventListener('click', function() {
+                        const val = document.getElementById('ledgerDayPicker').value;
+                        if (val) { ledgerDayView = new Date(val);
+                            updateLedgerSummary('day'); }
+                    });
+                    document.getElementById('ledgerDayPicker').valueAsDate = ledgerDayView;
+
+                    let dayItems = ledgerList.filter(item => {
+                        const d = new Date(item.date);
+                        return d >= startDate && d <= endDate;
+                    });
+                    if (ledgerFilterCategory !== 'all') dayItems = dayItems.filter(i => i.category === ledgerFilterCategory);
+                    const income = dayItems.filter(i => i.type === 'income').reduce((s, i) => s + i.amount, 0);
+                    const expense = dayItems.filter(i => i.type === 'expense').reduce((s, i) => s + i.amount, 0);
+                    const balance = income - expense;
+                    const content = document.getElementById('ledgerDayContent');
+                    content.innerHTML =
+                        `<div style="display:flex;gap:1.5rem;flex-wrap:wrap;padding:0.3rem 0;">
+                            <span>📈 进账：<strong style="color:#1a6a3a;">¥${income.toFixed(2)}</strong></span>
+                            <span>📉 支出：<strong style="color:#8a2a2a;">¥${expense.toFixed(2)}</strong></span>
+                            <span>💰 结余：<strong style="color:#4a3a5a;">¥${balance.toFixed(2)}</strong></span>
+                            <span style="font-size:0.7rem;color:#a0b8c8;">记录 ${dayItems.length} 笔</span>
+                        </div>
+                        <div style="margin-top:0.5rem;">
+                            <div style="font-size:0.75rem;font-weight:600;color:#4a3a5a;">📊 分类支出分析</div>
+                            <div class="pie-container">
+                                <div class="pie-canvas-wrap">
+                                    <canvas id="pie_day"></canvas>
+                                </div>
+                                <div class="pie-legend" id="legend_pie_day"></div>
+                            </div>
+                            <input type="hidden" id="labels_pie_day" value="${ledgerCategories.join(',')}" />
+                        </div>`;
+                    const catExpense = ledgerCategories.map(cat => {
+                        return dayItems.filter(i => i.type === 'expense' && i.category === cat).reduce((s,
+                            i) => s + i.amount, 0);
+                    });
+                    const colors = ['#7ab8d4', '#e8a040', '#4a9a7a', '#c05a5a', '#5a8ac0', '#c080c0', '#a0a0a0'];
+                    setTimeout(() => drawPie('pie_day', catExpense, colors), 50);
+                    renderLedger();
+                    return;
+                }
+
+                if (type === 'week') {
+                    const range = getWeekRange(now);
+                    startDate = range.start;
+                    endDate = range.end;
+                    label = `第${getWeekNumber(now)}周 (${formatDateCN(startDate)} ~ ${formatDateCN(endDate)})`;
+                } else if (type === 'month') {
+                    startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                    endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                    label = `${now.getFullYear()}年${now.getMonth()+1}月`;
+                } else if (type === 'year') {
+                    startDate = new Date(now.getFullYear(), 0, 1);
+                    endDate = new Date(now.getFullYear(), 11, 31);
+                    label = `${now.getFullYear()}年`;
+                }
+
+                let filtered = ledgerList.filter(item => {
+                    const d = new Date(item.date);
+                    return d >= startDate && d <= endDate;
+                });
+                if (ledgerFilterCategory !== 'all') filtered = filtered.filter(i => i.category === ledgerFilterCategory);
+                const income = filtered.filter(i => i.type === 'income').reduce((s, i) => s + i.amount, 0);
+                const expense = filtered.filter(i => i.type === 'expense').reduce((s, i) => s + i.amount, 0);
+                const balance = income - expense;
+
+                container.innerHTML = `
+                    <div style="display:flex;gap:1.5rem;flex-wrap:wrap;padding:0.3rem 0;">
+                        <span>📅 ${label}</span>
+                        <span>📈 进账：<strong style="color:#1a6a3a;">¥${income.toFixed(2)}</strong></span>
+                        <span>📉 支出：<strong style="color:#8a2a2a;">¥${expense.toFixed(2)}</strong></span>
+                        <span>💰 结余：<strong style="color:#4a3a5a;">¥${balance.toFixed(2)}</strong></span>
+                        <span style="font-size:0.7rem;color:#a0b8c8;">记录 ${filtered.length} 笔</span>
+                    </div>
+                    <div style="margin-top:0.5rem;">
+                        <div style="font-size:0.75rem;font-weight:600;color:#4a3a5a;">📊 分类支出分析</div>
+                        <div class="pie-container">
+                            <div class="pie-canvas-wrap">
+                                <canvas id="pie_summary"></canvas>
+                            </div>
+                            <div class="pie-legend" id="legend_pie_summary"></div>
+                        </div>
+                        <input type="hidden" id="labels_pie_summary" value="${ledgerCategories.join(',')}" />
+                    </div>
+                `;
+                const catExpense = ledgerCategories.map(cat => {
+                    return filtered.filter(i => i.type === 'expense' && i.category === cat).reduce((s, i) => s +
+                        i.amount, 0);
+                });
+                const colors = ['#7ab8d4', '#e8a040', '#4a9a7a', '#c05a5a', '#5a8ac0', '#c080c0', '#a0a0a0'];
+                setTimeout(() => drawPie('pie_summary', catExpense, colors), 50);
+                document.getElementById('ledgerGrid').style.display = 'none';
+                document.getElementById('ledgerGrid').innerHTML = '';
+            }
+
+            document.getElementById('addLedger').addEventListener('click', function() {
+                const type = document.getElementById('ledgerType').value;
+                const category = document.getElementById('ledgerCategorySelect').value;
+                const name = document.getElementById('ledgerName').value.trim();
+                const amount = parseFloat(document.getElementById('ledgerAmount').value);
+                const date = document.getElementById('ledgerDate').value;
+                if (!name || isNaN(amount) || !date) return;
+                ledgerList.push({ type, name, amount, date, category });
+                save(LEDGER_KEY, ledgerList);
+                document.getElementById('ledgerName').value = '';
+                document.getElementById('ledgerAmount').value = '';
+                updateLedgerSummary(ledgerSummaryType);
+            });
+
+            document.querySelectorAll('#ledgerSummaryTabs .filter-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('#ledgerSummaryTabs .filter-btn').forEach(b => b.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+                    const type = this.dataset.summary;
+                    if (type === 'day') { ledgerDayView = new Date(); }
+                    updateLedgerSummary(type);
+                });
+            });
+
+            document.getElementById('ledgerDate').valueAsDate = new Date();
+            renderLedgerCatTags();
+            setTimeout(() => updateLedgerSummary('day'), 100);
+
+            // 激活事件标签
+            document.querySelector('[data-tab="events"]')?.click();
+
+        })();
+    </script>
+</body>
+</html>
